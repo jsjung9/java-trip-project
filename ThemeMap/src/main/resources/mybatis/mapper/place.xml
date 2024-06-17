@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.ssafy.theme.place.mapper.PlaceMapper">
+
+	<resultMap type="placeDto" id="place">
+		<result column="place_id" property="placeId"/>
+		<result column="place_name" property="placeName"/>
+		<result column="latitude" property="latitude"/>
+		<result column="longitude" property="longitude"/>
+		<result column="score_sum" property="scoreSum"/>
+		<result column="score_count" property="scoreCount"/>
+		<result column="address" property="address"/>
+		<result column="phone" property="phone"/>
+	</resultMap>
+	
+	<insert id="createPlace" parameterType="placeDto">
+		insert into place (place_id, place_name, latitude, longitude, address, phone)
+		values (#{placeId}, #{placeName}, #{latitude}, #{longitude}, #{address}, #{phone})
+	</insert>
+	
+	<select id="hotPlace" resultMap="place">
+		select place_id, place_name, latitude, longitude, score_sum, score_count, address, phone from place
+		where score_count > 5
+		order by (score_sum / score_count) desc, score_count desc limit 10
+	</select>
+	
+	<select id="placesOfTheme" parameterType="string" resultMap="place">
+		SELECT place_id, place_name, latitude, longitude, score_sum, score_count, address, phone 
+		FROM place p
+		WHERE place_id IN (
+			SELECT pit.place_id 
+			FROM place_in_theme pit
+			WHERE pit.theme_id = #{themeId}
+		)
+		order by (score_sum/score_count) desc
+	</select>
+	
+	<insert id="linkPlace"  parameterType="linkDto">
+		insert into place_in_theme (theme_id, place_id, editor_id)
+		values (#{themeId}, #{placeId}, #{editorId})
+	</insert>
+	
+	<update id="keepScore" parameterType="string">
+		update place set score_sum = score_sum + #{score}, score_count = score_count + 1
+		where place_id = #{placeId}
+	</update>
+	
+	<select id="isThere" parameterType="string" resultType="int">
+		select count(place_id) from place
+		where place_id = #{placeId}
+	</select>
+	
+	<select id="isInTheme" parameterType="string" resultType="int">
+		select count(place_id) from place_in_theme
+		where theme_id = #{themeId} and place_id = #{placeId}
+	</select>
+	
+	<delete id="deletePlace" parameterType="string">
+		delete from place_in_theme
+		where theme_id = #{themeId} and place_id = #{placeId}
+	</delete>
+	
+	<select id="whoCreated" parameterType="string" resultType="string">
+		select editor_id from place_in_theme
+		where theme_id = #{themeId} and place_id = #{placeId}
+	</select>
+
+    <select id="getSpareNum" parameterType="string" resultType="int">
+        select count(*)
+        from place_in_theme
+        where theme_id = #{themeId} and editor_id = #{editorId}
+    </select>
+
+</mapper>
