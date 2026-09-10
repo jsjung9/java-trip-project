@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+.vscode/
+.env
+*.log
+ThemeMap/target/
+theme-map/node_modules/
+theme-map/dist/
