@@ -1,140 +1,124 @@
 package com.ssafy.theme.theme.service;
 
 import java.util.List;
+import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.theme.common.ForbiddenException;
+import com.ssafy.theme.common.NotFoundException;
+import com.ssafy.theme.editor.dto.EditorDto;
+import com.ssafy.theme.editor.service.EditorIdentity;
 import com.ssafy.theme.theme.dto.TagDto;
 import com.ssafy.theme.theme.dto.ThemeDto;
 import com.ssafy.theme.theme.mapper.ThemeMapper;
 
 @Service
 public class ThemeServiceImpl implements ThemeService {
+    private final ThemeMapper themeMapper;
+    private final EditorIdentity editorIdentity;
 
-    private ThemeMapper themeMapper;
-
-    @Autowired
-    public ThemeServiceImpl(ThemeMapper themMapper) {
-        this.themeMapper = themMapper;
+    public ThemeServiceImpl(ThemeMapper themeMapper, EditorIdentity editorIdentity) {
+        this.themeMapper = themeMapper;
+        this.editorIdentity = editorIdentity;
     }
 
     @Override
-    public String createTheme(ThemeDto themeDto) throws Exception {
-        themeMapper.createTheme(themeDto);
-        return themeMapper.returnTheme();
+    @Transactional
+    public String createTheme(ThemeDto theme, String loginId) {
+        theme.setEditorId(editorIdentity.require(loginId).getEditorId());
+        theme.setLikeSum("0");
+        themeMapper.createTheme(theme);
+        return theme.getThemeId();
     }
 
-    @Override
-    public List<ThemeDto> hotTheme() throws Exception {
-        return themeMapper.hotTheme();
-    }
+    @Override public List<ThemeDto> hotTheme() { return themeMapper.hotTheme(); }
+    @Override public List<ThemeDto> themesOfPlace(String placeId) { return themeMapper.themesOfPlace(placeId); }
+    @Override public List<ThemeDto> themesOfEditor(String editorId) { return themeMapper.themesOfEditor(editorId); }
+    @Override public List<ThemeDto> visibleThemesOfEditor(String editorId) { return themeMapper.visibleThemesOfEditor(editorId); }
+    @Override public List<ThemeDto> themesOfLike(String editorId) { return themeMapper.themesOfLike(editorId); }
 
     @Override
-    public List<ThemeDto> themesOfPlace(String placeId) throws Exception {
-        return themeMapper.themesOfPlace(placeId);
-    }
-
-    @Override
-    public List<ThemeDto> themesOfEditor(String editorId) throws Exception {
-        return themeMapper.themesOfEditor(editorId);
-    }
-
-    @Override
-    public List<ThemeDto> visibleThemesOfEditor(String editorId) throws Exception {
-        return themeMapper.visibleThemesOfEditor(editorId);
-    }
-
-    @Override
-    public List<ThemeDto> themesOfLike(String editorId) throws Exception {
-        return themeMapper.themesOfLike(editorId);
-    }
-
-    @Override
-    public void updateTheme(ThemeDto themeDto) throws Exception {
-        themeMapper.updateTheme(themeDto);
-    }
-
-    @Override
-    public void deleteTheme(String themeId) throws Exception {
-        themeMapper.deleteTheme(themeId);
-    }
-
-    @Override
-    public List<ThemeDto> themesOfTag(List<TagDto> tags) throws Exception {
-        return themeMapper.themesOfTag(tags);
-    }
-
-    @Override
-    public List<ThemeDto> allThemes() throws Exception {
-        return themeMapper.allThemes();
-    }
-
-    @Override
-    public List<TagDto> allTags() throws Exception {
-        return themeMapper.allTags();
-    }
-
-    @Override
-    public ThemeDto getTheme(String themeId) throws Exception {
-        return themeMapper.getTheme(themeId);
-    }
-
-    @Override
-    public int didLike(String editorId, String themeId) throws Exception {
-        return themeMapper.didLike(editorId, themeId);
-    }
-
-    @Override
-    public void postLike(String editorId, String themeId) throws Exception {
-        themeMapper.postLike(editorId, themeId);
-    }
-
-    @Override
-    public void increaseThemeLike(String themeId) throws Exception {
-        themeMapper.increaseThemeLike(themeId);
-    }
-
-    @Override
-    public void increaseEditorLike(String editorId) throws Exception {
-        themeMapper.increaseEditorLike(editorId);
-    }
-
-    @Override
-    public void disLike(String editorId, String themeId) throws Exception {
-        themeMapper.disLike(editorId, themeId);
-    }
-
-    @Override
-    public void decreaseThemeLike(String themeId) throws Exception {
-        themeMapper.decreaseThemeLike(themeId);
-    }
-
-    @Override
-    public void decreaseEditorLike(String editorId) throws Exception {
-        themeMapper.decreaseEditorLike(editorId);
-    }
-
-    @Override
-    public String findEditor(String themeId) throws Exception {
-        return themeMapper.findEditor(themeId);
-    }
-
-    @Override
-    public List<TagDto> tagsOfTheme(String themeId) throws Exception {
-        return themeMapper.tagsOfTheme(themeId);
-    }
-
-    @Override
-    public void deleteTags(String themeId) throws Exception {
-        themeMapper.deleteTags(themeId);
-    }
-
-    @Override
-    public void insertTags(String themeId, List<TagDto> tags) throws Exception {
-        for (TagDto tag : tags) {
-            themeMapper.insertTags(themeId, tag.getTagId());
+    @Transactional
+    public void updateTheme(ThemeDto theme, String loginId) {
+        theme.setEditorId(editorIdentity.require(loginId).getEditorId());
+        assertOwner(theme.getThemeId(), theme.getEditorId());
+        if (themeMapper.updateTheme(theme) != 1) {
+            throw new NotFoundException("테마를 찾을 수 없습니다.");
         }
     }
 
+    @Override
+    @Transactional
+    public void deleteTheme(String themeId, String loginId) {
+        String editorId = editorIdentity.require(loginId).getEditorId();
+        assertOwner(themeId, editorId);
+        if (themeMapper.deleteTheme(themeId, editorId) != 1) {
+            throw new NotFoundException("테마를 찾을 수 없습니다.");
+        }
+    }
+
+    @Override
+    public List<ThemeDto> themesOfTag(List<TagDto> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return allThemes();
+        }
+        return themeMapper.themesOfTag(tags, tags.size());
+    }
+
+    @Override public List<ThemeDto> allThemes() { return themeMapper.allThemes(); }
+    @Override public List<TagDto> allTags() { return themeMapper.allTags(); }
+    @Override public ThemeDto getTheme(String themeId) { return themeMapper.getTheme(themeId); }
+
+    @Override
+    public boolean didLike(String loginId, String themeId) {
+        return themeMapper.didLike(editorIdentity.require(loginId).getEditorId(), themeId) > 0;
+    }
+
+    @Override
+    @Transactional
+    public void setLike(String loginId, String themeId, boolean liked) {
+        EditorDto current = editorIdentity.require(loginId);
+        ThemeDto theme = requireTheme(themeId);
+        int changed = liked
+                ? themeMapper.postLike(current.getEditorId(), themeId)
+                : themeMapper.disLike(current.getEditorId(), themeId);
+        if (changed == 0) {
+            return;
+        }
+        if (liked) {
+            themeMapper.increaseThemeLike(themeId);
+            themeMapper.increaseEditorLike(theme.getEditorId());
+        } else {
+            themeMapper.decreaseThemeLike(themeId);
+            themeMapper.decreaseEditorLike(theme.getEditorId());
+        }
+    }
+
+    @Override public List<TagDto> tagsOfTheme(String themeId) { return themeMapper.tagsOfTheme(themeId); }
+
+    @Override
+    @Transactional
+    public void updateTags(String themeId, List<TagDto> tags, String loginId) {
+        assertOwner(themeId, editorIdentity.require(loginId).getEditorId());
+        themeMapper.deleteTags(themeId);
+        if (tags != null) {
+            tags.stream().filter(Objects::nonNull).map(TagDto::getTagId).filter(Objects::nonNull)
+                    .distinct().forEach(tagId -> themeMapper.insertTags(themeId, tagId));
+        }
+    }
+
+    private ThemeDto requireTheme(String themeId) {
+        ThemeDto theme = themeMapper.getTheme(themeId);
+        if (theme == null) throw new NotFoundException("테마를 찾을 수 없습니다.");
+        return theme;
+    }
+
+    private void assertOwner(String themeId, String editorId) {
+        ThemeDto theme = requireTheme(themeId);
+        if (!Objects.equals(theme.getEditorId(), editorId)) {
+            throw new ForbiddenException("테마 작성자만 변경할 수 있습니다.");
+        }
+    }
 }

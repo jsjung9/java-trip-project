@@ -23,6 +23,26 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(Map.of("message", message));
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    ResponseEntity<?> forbidden(ForbiddenException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", exception.getMessage()));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    ResponseEntity<?> notFound(NotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", exception.getMessage()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    ResponseEntity<?> conflict(ConflictException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", exception.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<?> badRequest(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(Map.of("message", exception.getMessage()));
+    }
+
     @ExceptionHandler(DuplicateKeyException.class)
     ResponseEntity<?> duplicate(DuplicateKeyException exception) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "이미 등록된 값입니다."));

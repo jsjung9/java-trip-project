@@ -19,7 +19,7 @@
         <result column="tag_name" property="tagName"/>
     </resultMap>
 
-    <insert id="createTheme" parameterType="themeDto">
+    <insert id="createTheme" parameterType="themeDto" useGeneratedKeys="true" keyProperty="themeId">
         insert into theme (theme_name, editor_id, description, type, visible, like_sum)
         values (#{themeName}, #{editorId}, #{description}, #{type}, #{visible}, 0)
     </insert>
@@ -66,9 +66,9 @@
         where theme_id = #{themeId}
     </update>
 
-    <delete id="deleteTheme" parameterType="string">
+    <delete id="deleteTheme">
         delete from theme
-        where theme_id = #{themeId}
+        where theme_id = #{themeId} and editor_id = #{editorId}
     </delete>
 
     <select id="themesOfTag" parameterType="list" resultMap="theme">
@@ -81,7 +81,7 @@
                 #{tag.tagId}
             </foreach>
             group by theme_id
-            having count(distinct tag_id) = ${tags.size}
+            having count(distinct tag_id) = #{tagCount}
         )
         group by t.theme_id
         having count(pt.place_id) > 0
@@ -110,7 +110,7 @@
     </select>
 
     <insert id="postLike" parameterType="string">
-        insert into like_theme (editor_id, theme_id)
+        insert ignore into like_theme (editor_id, theme_id)
         values (#{editorId}, #{themeId})
     </insert>
 
@@ -133,13 +133,13 @@
 
     <update id="decreaseThemeLike" parameterType="string">
         update theme
-        set like_sum = like_sum - 1
+        set like_sum = GREATEST(like_sum - 1, 0)
         where theme_id = #{themeId}
     </update>
 
     <update id="decreaseEditorLike" parameterType="string">
         update editor
-        set like_sum = like_sum - 1
+        set like_sum = GREATEST(like_sum - 1, 0)
         where editor_id = #{editorId}
     </update>
 
@@ -149,9 +149,6 @@
         where theme_id = #{themeId}
     </select>
 
-    <select id="returnTheme" resultType="string">
-        select max(theme_id) from theme
-    </select>
 
     <select id="tagsOfTheme" parameterType="string" resultMap="tag">
         select t.tag_id, t.tag_name from tag t

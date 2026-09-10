@@ -1,15 +1,10 @@
 package com.ssafy.theme.theme.controller;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,237 +21,96 @@ import com.ssafy.theme.theme.dto.ThemeDto;
 import com.ssafy.theme.theme.service.ThemeService;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/theme")
 public class ThemeController {
+    private final ThemeService themeService;
 
-    private ThemeService themeService;
-
-    @Autowired
     public ThemeController(ThemeService themeService) {
         this.themeService = themeService;
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createTheme(@RequestBody ThemeDto themeDto) {
-        try {
-            String themeId = themeService.createTheme(themeDto);
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themeId);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public ResponseEntity<String> createTheme(Authentication authentication, @RequestBody ThemeDto theme) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(themeService.createTheme(theme, authentication.getName()));
     }
 
     @GetMapping("/hot")
-    public ResponseEntity<?> hotTheme() {
-        try {
-            List<ThemeDto> themes = themeService.hotTheme();
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themes);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
-    }
+    public List<ThemeDto> hotTheme() { return themeService.hotTheme(); }
 
-    // place가 속해 있는 theme를 검색
     @GetMapping("/place/{placeId}")
-    public ResponseEntity<?> themesOfPlace(@PathVariable("placeId") String placeId) {
-        try {
-            List<ThemeDto> themes = themeService.themesOfPlace(placeId);
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themes);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public List<ThemeDto> themesOfPlace(@PathVariable String placeId) {
+        return themeService.themesOfPlace(placeId);
     }
 
-    // editor가 만든 theme를 검색
     @GetMapping("/editor/{editorId}")
-    public ResponseEntity<?> themesOfEditor(@PathVariable("editorId") String editorId) {
-        try {
-            List<ThemeDto> themes = themeService.themesOfEditor(editorId);
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themes);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public List<ThemeDto> themesOfEditor(@PathVariable String editorId) {
+        return themeService.themesOfEditor(editorId);
     }
 
-    // editor가 만든 visible = 1인 theme를 검색
     @GetMapping("/visible/{editorId}")
-    public ResponseEntity<?> visibleThemesOfEditor(@PathVariable("editorId") String editorId) {
-        try {
-            List<ThemeDto> themes = themeService.visibleThemesOfEditor(editorId);
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themes);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public List<ThemeDto> visibleThemesOfEditor(@PathVariable String editorId) {
+        return themeService.visibleThemesOfEditor(editorId);
     }
 
-    // editor가 좋아요 누른 theme를 검색
     @GetMapping("/like/{editorId}")
-    public ResponseEntity<?> themesOfLike(@PathVariable("editorId") String editorId) {
-        try {
-            List<ThemeDto> themes = themeService.themesOfLike(editorId);
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themes);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public List<ThemeDto> themesOfLike(@PathVariable String editorId) {
+        return themeService.themesOfLike(editorId);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateTheme(@RequestBody ThemeDto themeDto) {
-        try {
-            themeService.updateTheme(themeDto);
-            return new ResponseEntity<Void>(HttpStatus.OK);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public ResponseEntity<Void> updateTheme(Authentication authentication, @RequestBody ThemeDto theme) {
+        themeService.updateTheme(theme, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete/{themeId}")
-    public ResponseEntity<?> deleteTheme(@PathVariable("themeId") String themeId) {
-        try {
-            themeService.deleteTheme(themeId);
-            return new ResponseEntity<Void>(HttpStatus.OK);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public ResponseEntity<Void> deleteTheme(Authentication authentication, @PathVariable String themeId) {
+        themeService.deleteTheme(themeId, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 
-    // tag 리스트를 입력받아서 해당하는 theme 검색
-    // {
-    // "tags": [{"tagId":"1", "tagName":"tag1"}, {"tagId":"2", "tagName":"tag2"}]
-    // }
     @PostMapping("/tag")
-    public ResponseEntity<?> themesOfTag(@RequestBody TagListDto tagListDto) {
-        try {
-            List<ThemeDto> themes = themeService.themesOfTag(tagListDto.getTags());
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themes);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public List<ThemeDto> themesOfTag(@RequestBody TagListDto tagList) {
+        return themeService.themesOfTag(tagList.getTags());
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> allThemes() {
-        try {
-            List<ThemeDto> themes = themeService.allThemes();
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(themes);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
-    }
+    public List<ThemeDto> allThemes() { return themeService.allThemes(); }
 
     @GetMapping("/allTags")
-    public ResponseEntity<?> allTags() {
-        try {
-            List<TagDto> tags = themeService.allTags();
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(tags);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
-    }
+    public List<TagDto> allTags() { return themeService.allTags(); }
 
     @GetMapping("/get/{themeId}")
-    public ResponseEntity<?> getTheme(@PathVariable("themeId") String themeId) {
-        try {
-            ThemeDto theme = themeService.getTheme(themeId);
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(theme);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public ThemeDto getTheme(@PathVariable String themeId) { return themeService.getTheme(themeId); }
+
+    @GetMapping("/didLike/{ignoredEditorId}/{themeId}")
+    public boolean didLike(Authentication authentication, @PathVariable String ignoredEditorId,
+            @PathVariable String themeId) {
+        return themeService.didLike(authentication.getName(), themeId);
     }
 
-    @GetMapping("/didLike/{editorId}/{themeId}")
-    public ResponseEntity<?> didLike(@PathVariable("editorId") String editorId, @PathVariable("themeId") String themeId) {
-        try {
-            boolean did = themeService.didLike(editorId, themeId) == 1 ? true : false;
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(did);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
-    }
-
-    @Transactional
     @PostMapping("/postLike")
-    public ResponseEntity<?> postLike(@RequestBody LikeDto likeDto) {
-        System.out.println(likeDto);
-        try {
-            // like_theme에 좋아요 등록
-            themeService.postLike(likeDto.getEditorId(), likeDto.getThemeId());
-            // theme에 like_sum 1 증가
-            themeService.increaseThemeLike(likeDto.getThemeId());
-            // editor에 like_sum 1 증가
-            themeService.increaseEditorLike(themeService.findEditor(likeDto.getThemeId()));
-
-            return new ResponseEntity<Void>(HttpStatus.CREATED);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public ResponseEntity<Void> postLike(Authentication authentication, @RequestBody LikeDto like) {
+        themeService.setLike(authentication.getName(), like.getThemeId(), true);
+        return ResponseEntity.noContent().build();
     }
 
-    @Transactional
     @PostMapping("/disLike")
-    public ResponseEntity<?> disLike(@RequestBody LikeDto likeDto) {
-        try {
-            // like_theme에 좋아요 삭제
-            themeService.disLike(likeDto.getEditorId(), likeDto.getThemeId());
-            // theme에 like_sum 1 감소
-            themeService.decreaseThemeLike(likeDto.getThemeId());
-            // editor에 like_sum 1 감소
-            themeService.decreaseEditorLike(themeService.findEditor(likeDto.getThemeId()));
-            return new ResponseEntity<Void>(HttpStatus.OK);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public ResponseEntity<Void> disLike(Authentication authentication, @RequestBody LikeDto like) {
+        themeService.setLike(authentication.getName(), like.getThemeId(), false);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/tagsOfTheme/{themeId}")
-    public ResponseEntity<?> tagsOfTheme(@PathVariable("themeId") String themeId) {
-        try {
-            List<TagDto> tags = themeService.tagsOfTheme(themeId);
-            HttpHeaders header = new HttpHeaders();
-            header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-            return ResponseEntity.ok().headers(header).body(tags);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public List<TagDto> tagsOfTheme(@PathVariable String themeId) {
+        return themeService.tagsOfTheme(themeId);
     }
 
     @PostMapping("/updateTag/{themeId}")
-    public ResponseEntity<?> updateTag(@RequestBody TagListDto tagListDto, @PathVariable("themeId") String themeId) {
-        try {
-            themeService.deleteTags(themeId);
-            themeService.insertTags(themeId, tagListDto.getTags());
-            return new ResponseEntity<Void>(HttpStatus.CREATED);
-        } catch (Exception e) {
-            return exceptionHandling(e);
-        }
+    public ResponseEntity<Void> updateTag(Authentication authentication, @RequestBody TagListDto tagList,
+            @PathVariable String themeId) {
+        themeService.updateTags(themeId, tagList.getTags(), authentication.getName());
+        return ResponseEntity.noContent().build();
     }
-
-    private ResponseEntity<String> exceptionHandling(Exception e) {
-        e.printStackTrace();
-        return new ResponseEntity<String>("Error : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
 }

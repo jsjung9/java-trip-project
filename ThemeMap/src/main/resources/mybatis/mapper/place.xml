@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.theme.place.mapper.PlaceMapper">
-
     <resultMap type="placeDto" id="place">
         <result column="place_id" property="placeId"/>
         <result column="place_name" property="placeName"/>
@@ -16,61 +14,64 @@
     </resultMap>
 
     <insert id="createPlace" parameterType="placeDto">
-        insert into place (place_id, place_name, latitude, longitude, address, phone)
-        values (#{placeId}, #{placeName}, #{latitude}, #{longitude}, #{address}, #{phone})
+        INSERT IGNORE INTO place (place_id, place_name, latitude, longitude, address, phone)
+        VALUES (#{placeId}, #{placeName}, #{latitude}, #{longitude}, #{address}, #{phone})
     </insert>
 
     <select id="hotPlace" resultMap="place">
-        select place_id, place_name, latitude, longitude, score_sum, score_count, address, phone from place
-        where score_count > 5
-        order by (score_sum / score_count) desc, score_count desc limit 10
-    </select>
-
-    <select id="placesOfTheme" parameterType="string" resultMap="place">
         SELECT place_id, place_name, latitude, longitude, score_sum, score_count, address, phone
-        FROM place p
-        WHERE place_id IN (
-            SELECT pit.place_id
-            FROM place_in_theme pit
-            WHERE pit.theme_id = #{themeId}
-        )
-        order by (score_sum/score_count) desc
+        FROM place
+        WHERE score_count &gt; 5
+        ORDER BY (score_sum / score_count) DESC, score_count DESC
+        LIMIT 10
     </select>
 
-    <insert id="linkPlace"  parameterType="linkDto">
-        insert into place_in_theme (theme_id, place_id, editor_id)
-        values (#{themeId}, #{placeId}, #{editorId})
+    <select id="placesOfTheme" resultMap="place">
+        SELECT p.place_id, p.place_name, p.latitude, p.longitude, p.score_sum, p.score_count, p.address, p.phone
+        FROM place p
+        JOIN place_in_theme pit ON pit.place_id = p.place_id
+        WHERE pit.theme_id = #{themeId}
+        ORDER BY CASE WHEN p.score_count = 0 THEN 0 ELSE p.score_sum / p.score_count END DESC
+    </select>
+
+    <insert id="linkPlace" parameterType="linkDto">
+        INSERT IGNORE INTO place_in_theme (theme_id, place_id, editor_id)
+        VALUES (#{themeId}, #{placeId}, #{editorId})
     </insert>
 
-    <update id="keepScore" parameterType="string">
-        update place set score_sum = score_sum + #{score}, score_count = score_count + 1
-        where place_id = #{placeId}
+    <insert id="upsertScore">
+        INSERT INTO place_score (place_id, editor_id, score)
+        VALUES (#{placeId}, #{editorId}, #{score})
+        ON DUPLICATE KEY UPDATE score = #{score}, updated_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <update id="recalculateScore">
+        UPDATE place
+        SET score_sum = COALESCE((SELECT SUM(score) FROM place_score WHERE place_id = #{placeId}), 0),
+            score_count = (SELECT COUNT(*) FROM place_score WHERE place_id = #{placeId})
+        WHERE place_id = #{placeId}
     </update>
 
-    <select id="isThere" parameterType="string" resultType="int">
-        select count(place_id) from place
-        where place_id = #{placeId}
+    <select id="isThere" resultType="int">
+        SELECT COUNT(*) FROM place WHERE place_id = #{placeId}
     </select>
 
-    <select id="isInTheme" parameterType="string" resultType="int">
-        select count(place_id) from place_in_theme
-        where theme_id = #{themeId} and place_id = #{placeId}
+    <select id="isInTheme" resultType="int">
+        SELECT COUNT(*) FROM place_in_theme WHERE theme_id = #{themeId} AND place_id = #{placeId}
     </select>
 
-    <delete id="deletePlace" parameterType="string">
-        delete from place_in_theme
-        where theme_id = #{themeId} and place_id = #{placeId}
+    <delete id="deletePlace">
+        DELETE pit FROM place_in_theme pit
+        JOIN theme t ON t.theme_id = pit.theme_id
+        WHERE pit.theme_id = #{themeId} AND pit.place_id = #{placeId}
+          AND (pit.editor_id = #{editorId} OR t.editor_id = #{editorId})
     </delete>
 
-    <select id="whoCreated" parameterType="string" resultType="string">
-        select editor_id from place_in_theme
-        where theme_id = #{themeId} and place_id = #{placeId}
+    <select id="whoCreated" resultType="string">
+        SELECT editor_id FROM place_in_theme WHERE theme_id = #{themeId} AND place_id = #{placeId}
     </select>
 
-    <select id="getSpareNum" parameterType="string" resultType="int">
-        select count(*)
-        from place_in_theme
-        where theme_id = #{themeId} and editor_id = #{editorId}
+    <select id="getSpareNum" resultType="int">
+        SELECT COUNT(*) FROM place_in_theme WHERE theme_id = #{themeId} AND editor_id = #{editorId}
     </select>
-
 </mapper>
