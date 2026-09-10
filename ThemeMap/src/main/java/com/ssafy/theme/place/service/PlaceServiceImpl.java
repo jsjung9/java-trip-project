@@ -1,5 +1,6 @@
 package com.ssafy.theme.place.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,6 +33,8 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public void createPlace(PlaceDto place) {
+        validateCoordinate(place.getLatitude(), -90, 90, "위도");
+        validateCoordinate(place.getLongitude(), -180, 180, "경도");
         placeMapper.createPlace(place);
     }
 
@@ -99,5 +102,17 @@ public class PlaceServiceImpl implements PlaceService {
     @Override
     public int getSpareNum(String themeId, String loginId) {
         return placeMapper.getSpareNum(themeId, editorIdentity.numericId(loginId));
+    }
+
+    private void validateCoordinate(String rawValue, int minimum, int maximum, String field) {
+        try {
+            BigDecimal value = new BigDecimal(rawValue);
+            if (value.compareTo(BigDecimal.valueOf(minimum)) < 0
+                    || value.compareTo(BigDecimal.valueOf(maximum)) > 0) {
+                throw new IllegalArgumentException(field + " 범위를 확인해 주세요.");
+            }
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException(field + " 형식을 확인해 주세요.");
+        }
     }
 }

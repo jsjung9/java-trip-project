@@ -19,6 +19,8 @@ import com.ssafy.theme.place.dto.PlaceDto;
 import com.ssafy.theme.place.dto.ScoreDto;
 import com.ssafy.theme.place.service.PlaceService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/place")
 public class PlaceController {
@@ -29,7 +31,7 @@ public class PlaceController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Void> createPlace(@RequestBody PlaceDto place) {
+    public ResponseEntity<Void> createPlace(@Valid @RequestBody PlaceDto place) {
         placeService.createPlace(place);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -43,13 +45,13 @@ public class PlaceController {
     }
 
     @PutMapping("/score")
-    public ResponseEntity<Void> keepScore(Authentication authentication, @RequestBody ScoreDto score) {
+    public ResponseEntity<Void> keepScore(Authentication authentication, @Valid @RequestBody ScoreDto score) {
         placeService.keepScore(score.getPlaceId(), score.getScore(), authentication.getName());
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/link")
-    public ResponseEntity<Void> linkPlace(Authentication authentication, @RequestBody LinkDto link) {
+    public ResponseEntity<Void> linkPlace(Authentication authentication, @Valid @RequestBody LinkDto link) {
         placeService.linkPlace(link, authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

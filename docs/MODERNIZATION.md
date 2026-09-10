@@ -29,7 +29,7 @@
 | 프론트 | Axios 단일 인스턴스, 동시 refresh 공유, route lazy loading, 공유 DTO 제거 |
 | 재현성 | Flyway V1/V2, Docker Compose, 비root 런타임 이미지 |
 | 자동화 | GitHub Actions와 Dependabot |
-| 품질 | 백엔드 13개·프론트 2개 테스트, ESLint 오류 0, npm audit 0 |
+| 품질 | 백엔드 14개·프론트 2개 테스트, ESLint 오류 0, npm audit 0 |
 
 프론트는 기존 단일 152.31 kB JavaScript 번들에서 화면별 동적 청크 17개와 공통 청크로 분리되었습니다. 이 수치는 전체 전송량 감소를 뜻하지 않으며, 사용자가 방문하지 않은 화면 코드를 초기 경로에서 늦게 내려받게 한 결과입니다.
 
@@ -38,7 +38,7 @@
 2026-09-10 로컬 환경에서 다음 검사를 통과했습니다.
 
 ```text
-./mvnw clean verify                  13 tests, 0 failures
+./mvnw clean verify                  14 tests, 0 failures
 npm run lint                         0 errors, 0 warnings
 npm run test                         2 tests, 0 failures
 npm run build                        production build success

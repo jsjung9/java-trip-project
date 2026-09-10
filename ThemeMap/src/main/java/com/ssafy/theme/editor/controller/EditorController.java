@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.theme.editor.dto.EditorDto;
+import com.ssafy.theme.editor.dto.LoginRequest;
 import com.ssafy.theme.editor.service.EditorService;
 import com.ssafy.theme.util.JWTUtil;
 
@@ -47,8 +48,8 @@ public class EditorController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody EditorDto credentials) throws Exception {
-        EditorDto editor = service.login(credentials);
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest credentials) throws Exception {
+        EditorDto editor = service.login(credentials.toEditorDto());
         if (editor == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "아이디 또는 비밀번호를 확인해 주세요."));

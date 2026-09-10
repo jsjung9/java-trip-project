@@ -62,7 +62,7 @@ cd ../theme-map && npm ci && npm run lint && npm run test && npm run build
 npm audit --audit-level=moderate
 ```
 
-현재 검증 기준은 백엔드 **13개 테스트**, 프론트엔드 **2개 테스트**, ESLint 오류 0건, npm 알려진 취약점 0건입니다. CI도 같은 검사를 수행합니다.
+현재 검증 기준은 백엔드 **14개 테스트**, 프론트엔드 **2개 테스트**, ESLint 오류 0건, npm 알려진 취약점 0건입니다. CI도 같은 검사를 수행합니다.
 
 ## 문서
 

@@ -13,6 +13,7 @@ import com.ssafy.theme.common.ConflictException;
 import com.ssafy.theme.common.ForbiddenException;
 import com.ssafy.theme.editor.service.EditorIdentity;
 import com.ssafy.theme.place.dto.LinkDto;
+import com.ssafy.theme.place.dto.PlaceDto;
 import com.ssafy.theme.place.mapper.PlaceMapper;
 import com.ssafy.theme.theme.dto.ThemeDto;
 import com.ssafy.theme.theme.mapper.ThemeMapper;
@@ -61,6 +62,15 @@ class PlaceServiceImplTest {
         assertThatThrownBy(() -> service.linkPlace(link, "login-id"))
                 .isInstanceOf(ForbiddenException.class);
         verify(placeMapper, never()).linkPlace(link);
+    }
+
+    @Test
+    void rejectsCoordinateOutsideEarthRange() {
+        PlaceDto place = new PlaceDto("p1", "장소", "91", "127", "0", "0", "서울", "");
+
+        assertThatThrownBy(() -> service.createPlace(place))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(placeMapper, never()).createPlace(place);
     }
 
     private ThemeDto theme(String id, String editorId) {

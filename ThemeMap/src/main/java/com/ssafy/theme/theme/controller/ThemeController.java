@@ -20,6 +20,8 @@ import com.ssafy.theme.theme.dto.TagListDto;
 import com.ssafy.theme.theme.dto.ThemeDto;
 import com.ssafy.theme.theme.service.ThemeService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/theme")
 public class ThemeController {
@@ -30,7 +32,7 @@ public class ThemeController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createTheme(Authentication authentication, @RequestBody ThemeDto theme) {
+    public ResponseEntity<String> createTheme(Authentication authentication, @Valid @RequestBody ThemeDto theme) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(themeService.createTheme(theme, authentication.getName()));
     }
@@ -59,7 +61,7 @@ public class ThemeController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Void> updateTheme(Authentication authentication, @RequestBody ThemeDto theme) {
+    public ResponseEntity<Void> updateTheme(Authentication authentication, @Valid @RequestBody ThemeDto theme) {
         themeService.updateTheme(theme, authentication.getName());
         return ResponseEntity.noContent().build();
     }
@@ -93,13 +95,13 @@ public class ThemeController {
     }
 
     @PostMapping("/postLike")
-    public ResponseEntity<Void> postLike(Authentication authentication, @RequestBody LikeDto like) {
+    public ResponseEntity<Void> postLike(Authentication authentication, @Valid @RequestBody LikeDto like) {
         themeService.setLike(authentication.getName(), like.getThemeId(), true);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/disLike")
-    public ResponseEntity<Void> disLike(Authentication authentication, @RequestBody LikeDto like) {
+    public ResponseEntity<Void> disLike(Authentication authentication, @Valid @RequestBody LikeDto like) {
         themeService.setLike(authentication.getName(), like.getThemeId(), false);
         return ResponseEntity.noContent().build();
     }
