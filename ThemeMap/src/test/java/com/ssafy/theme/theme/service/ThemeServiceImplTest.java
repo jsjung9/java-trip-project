@@ -62,6 +62,16 @@ class ThemeServiceImplTest {
         verify(mapper, never()).increaseEditorLike("8");
     }
 
+    @Test
+    void hidesPrivateThemeFromAnonymousViewer() {
+        ThemeDto stored = theme("42", "8");
+        stored.setVisible("0");
+        when(mapper.getTheme("42")).thenReturn(stored);
+
+        assertThatThrownBy(() -> service.getTheme("42", null))
+                .isInstanceOf(ForbiddenException.class);
+    }
+
     private ThemeDto theme(String id, String editorId) {
         return new ThemeDto(id, "서울 산책", "설명", editorId, "walk", "1", "0");
     }

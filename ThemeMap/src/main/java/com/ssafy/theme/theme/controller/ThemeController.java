@@ -44,8 +44,8 @@ public class ThemeController {
     }
 
     @GetMapping("/editor/{editorId}")
-    public List<ThemeDto> themesOfEditor(@PathVariable String editorId) {
-        return themeService.themesOfEditor(editorId);
+    public List<ThemeDto> themesOfEditor(Authentication authentication, @PathVariable String editorId) {
+        return themeService.themesOfEditor(editorId, authentication.getName());
     }
 
     @GetMapping("/visible/{editorId}")
@@ -54,8 +54,8 @@ public class ThemeController {
     }
 
     @GetMapping("/like/{editorId}")
-    public List<ThemeDto> themesOfLike(@PathVariable String editorId) {
-        return themeService.themesOfLike(editorId);
+    public List<ThemeDto> themesOfLike(Authentication authentication, @PathVariable String editorId) {
+        return themeService.themesOfLike(editorId, authentication.getName());
     }
 
     @PutMapping("/update")
@@ -82,7 +82,9 @@ public class ThemeController {
     public List<TagDto> allTags() { return themeService.allTags(); }
 
     @GetMapping("/get/{themeId}")
-    public ThemeDto getTheme(@PathVariable String themeId) { return themeService.getTheme(themeId); }
+    public ThemeDto getTheme(Authentication authentication, @PathVariable String themeId) {
+        return themeService.getTheme(themeId, authentication == null ? null : authentication.getName());
+    }
 
     @GetMapping("/didLike/{ignoredEditorId}/{themeId}")
     public boolean didLike(Authentication authentication, @PathVariable String ignoredEditorId,

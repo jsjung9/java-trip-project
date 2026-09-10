@@ -35,9 +35,17 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override public List<ThemeDto> hotTheme() { return themeMapper.hotTheme(); }
     @Override public List<ThemeDto> themesOfPlace(String placeId) { return themeMapper.themesOfPlace(placeId); }
-    @Override public List<ThemeDto> themesOfEditor(String editorId) { return themeMapper.themesOfEditor(editorId); }
+    @Override
+    public List<ThemeDto> themesOfEditor(String editorId, String loginId) {
+        assertCurrentEditor(editorId, loginId);
+        return themeMapper.themesOfEditor(editorId);
+    }
     @Override public List<ThemeDto> visibleThemesOfEditor(String editorId) { return themeMapper.visibleThemesOfEditor(editorId); }
-    @Override public List<ThemeDto> themesOfLike(String editorId) { return themeMapper.themesOfLike(editorId); }
+    @Override
+    public List<ThemeDto> themesOfLike(String editorId, String loginId) {
+        assertCurrentEditor(editorId, loginId);
+        return themeMapper.themesOfLike(editorId);
+    }
 
     @Override
     @Transactional
@@ -69,7 +77,16 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override public List<ThemeDto> allThemes() { return themeMapper.allThemes(); }
     @Override public List<TagDto> allTags() { return themeMapper.allTags(); }
-    @Override public ThemeDto getTheme(String themeId) { return themeMapper.getTheme(themeId); }
+    @Override
+    public ThemeDto getTheme(String themeId, String loginId) {
+        ThemeDto theme = requireTheme(themeId);
+        if (!"1".equals(theme.getVisible())) {
+            if (loginId == null || !Objects.equals(theme.getEditorId(), editorIdentity.numericId(loginId))) {
+                throw new ForbiddenException("비공개 테마는 작성자만 볼 수 있습니다.");
+            }
+        }
+        return theme;
+    }
 
     @Override
     public boolean didLike(String loginId, String themeId) {
@@ -106,6 +123,12 @@ public class ThemeServiceImpl implements ThemeService {
         if (tags != null) {
             tags.stream().filter(Objects::nonNull).map(TagDto::getTagId).filter(Objects::nonNull)
                     .distinct().forEach(tagId -> themeMapper.insertTags(themeId, tagId));
+        }
+    }
+
+    private void assertCurrentEditor(String editorId, String loginId) {
+        if (!Objects.equals(editorId, editorIdentity.numericId(loginId))) {
+            throw new ForbiddenException("본인의 테마 정보만 조회할 수 있습니다.");
         }
     }
 

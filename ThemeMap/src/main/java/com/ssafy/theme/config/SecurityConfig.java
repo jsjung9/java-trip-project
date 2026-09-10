@@ -26,7 +26,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/editor/login", "/editor/regist", "/editor/refresh").permitAll()
                         .requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                        .requestMatchers("/theme/didLike/**", "/place/spare/**").authenticated()
+                        .requestMatchers("/theme/didLike/**", "/theme/editor/**", "/theme/like/**",
+                                "/place/spare/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/theme/**", "/place/**", "/comment/**",
                                 "/editor/name/**", "/editor/power").permitAll()
                         .anyRequest().authenticated())

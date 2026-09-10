@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.ssafy.theme.common.ConflictException;
+import com.ssafy.theme.common.ForbiddenException;
 import com.ssafy.theme.editor.service.EditorIdentity;
 import com.ssafy.theme.place.dto.LinkDto;
 import com.ssafy.theme.place.mapper.PlaceMapper;
@@ -46,6 +47,20 @@ class PlaceServiceImplTest {
         assertThatThrownBy(() -> service.keepScore("place-1", "6", "login-id"))
                 .isInstanceOf(IllegalArgumentException.class);
         verify(placeMapper, never()).upsertScore("place-1", "7", 6);
+    }
+
+    @Test
+    void privateThemeRejectsOtherContributors() {
+        LinkDto link = new LinkDto("10", "place-2", null);
+        ThemeDto privateTheme = theme("10", "8");
+        privateTheme.setType("0");
+        when(themeMapper.getTheme("10")).thenReturn(privateTheme);
+        when(themeMapper.findEditor("10")).thenReturn("8");
+        when(placeMapper.isThere("place-2")).thenReturn(1);
+
+        assertThatThrownBy(() -> service.linkPlace(link, "login-id"))
+                .isInstanceOf(ForbiddenException.class);
+        verify(placeMapper, never()).linkPlace(link);
     }
 
     private ThemeDto theme(String id, String editorId) {

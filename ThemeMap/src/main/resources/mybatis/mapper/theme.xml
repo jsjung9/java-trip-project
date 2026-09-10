@@ -34,11 +34,10 @@
     </select>
 
     <select id="themesOfPlace" parameterType="string" resultMap="theme">
-        select theme_id, theme_name, editor_id, description, type, visible, like_sum from theme
-        where theme_id in (
-            select theme_id from place_in_theme
-            where place_id = #{placeId}
-        )
+        SELECT t.theme_id, t.theme_name, t.editor_id, t.description, t.type, t.visible, t.like_sum
+        FROM theme t
+        JOIN place_in_theme pit ON pit.theme_id = t.theme_id
+        WHERE pit.place_id = #{placeId} AND t.visible = 1
     </select>
 
     <select id="themesOfEditor" parameterType="string" resultMap="theme">

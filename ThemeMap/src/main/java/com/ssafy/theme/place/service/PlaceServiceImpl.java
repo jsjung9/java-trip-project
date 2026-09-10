@@ -52,6 +52,9 @@ public class PlaceServiceImpl implements PlaceService {
             return;
         }
         boolean owner = Objects.equals(themeMapper.findEditor(link.getThemeId()), editorId);
+        if ("0".equals(themeMapper.getTheme(link.getThemeId()).getType()) && !owner) {
+            throw new ForbiddenException("비공개 테마에는 작성자만 장소를 추가할 수 있습니다.");
+        }
         int limit = owner ? OWNER_PLACE_LIMIT : CONTRIBUTOR_PLACE_LIMIT;
         if (placeMapper.getSpareNum(link.getThemeId(), editorId) >= limit) {
             throw new ConflictException("이 테마에 추가할 수 있는 장소 수를 초과했습니다.");
