@@ -1,38 +1,38 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useEditorStore } from '@/stores/editor';
-import { themesOfPlace } from '@/api/theme';
-import { registComment, commentsOfPlace } from '@/api/comment';
-import { keepScore } from '@/api/place';
+import { ref, onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { useEditorStore } from "@/stores/editor";
+import { themesOfPlace } from "@/api/theme";
+import { registComment, commentsOfPlace } from "@/api/comment";
+import { keepScore } from "@/api/place";
 
 const editorStore = useEditorStore();
 
 const props = defineProps({ place: Object });
 const { isLogin } = storeToRefs(editorStore);
 
-const place = ref({
-  placeId: '',
-  placeName: '',
-  latitude: '',
-  longitude: '',
-  scoreSum: '',
-  scoreCount: '',
-  address: '',
-  phone: '',
+const placeView = ref({
+  placeId: "",
+  placeName: "",
+  latitude: "",
+  longitude: "",
+  scoreSum: "",
+  scoreCount: "",
+  address: "",
+  phone: "",
 });
 
 const comment = ref({
-  placeId: '',
-  content: '',
+  placeId: "",
+  content: "",
 });
 
 const themeInfos = ref([]);
 const commentInfos = ref([]);
 
 const scoreDto = ref({
-  placeId: '',
-  score: '',
+  placeId: "",
+  score: "",
 });
 
 onMounted(() => {
@@ -47,12 +47,12 @@ watch(
       initialize();
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 function initialize() {
-  place.value = props.place;
-  comment.value.placeId = place.value.placeId;
+  placeView.value = props.place;
+  comment.value.placeId = placeView.value.placeId;
   getThemesOfPlace();
   getCommentsOfPlace();
   raise(0, 0);
@@ -62,14 +62,22 @@ const raise = (param, count) => {
   starRating.value.rating =
     props.place.scoreCount === 0
       ? 0
-      : ((Number(props.place.scoreSum) + Number(param)) / (Number(props.place.scoreCount) + Number(count))).toFixed(1);
+      : (
+          (Number(props.place.scoreSum) + Number(param)) /
+          (Number(props.place.scoreCount) + Number(count))
+        ).toFixed(1);
   starRating.value.validRating =
-    !isNaN(parseFloat(starRating.value.rating)) && isFinite(starRating.value.rating)
+    !isNaN(parseFloat(starRating.value.rating)) &&
+    isFinite(starRating.value.rating)
       ? parseFloat(starRating.value.rating)
       : 0;
-  starRating.value.fullStars = Math.max(0, Math.min(5, Math.floor(starRating.value.validRating)));
+  starRating.value.fullStars = Math.max(
+    0,
+    Math.min(5, Math.floor(starRating.value.validRating)),
+  );
   starRating.value.halfStar = starRating.value.validRating % 1 >= 0.5 ? 1 : 0;
-  starRating.value.emptyStars = 5 - starRating.value.fullStars - starRating.value.halfStar;
+  starRating.value.emptyStars =
+    5 - starRating.value.fullStars - starRating.value.halfStar;
 };
 
 const starRating = ref({
@@ -82,25 +90,25 @@ const starRating = ref({
 
 const getThemesOfPlace = () => {
   themesOfPlace(
-    place.value.placeId,
+    placeView.value.placeId,
     ({ data }) => {
       themeInfos.value = data;
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
 const getCommentsOfPlace = () => {
   commentsOfPlace(
-    place.value.placeId,
+    placeView.value.placeId,
     ({ data }) => {
       commentInfos.value = data;
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -109,19 +117,19 @@ const handelComment = (event) => {
   registComment(
     comment.value,
     () => {
-      comment.value.content = '';
+      comment.value.content = "";
       commentInfos.value.push({ ...comment.value });
       getCommentsOfPlace();
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
 const scoring = (event) => {
   evaluated.value = true;
-  scoreDto.value.placeId = place.value.placeId;
+  scoreDto.value.placeId = placeView.value.placeId;
   scoreDto.value.score = event.target.id;
   keepScore(
     scoreDto.value,
@@ -131,15 +139,15 @@ const scoring = (event) => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
-const emit = defineEmits(['updateScore']);
+const emit = defineEmits(["updateScore"]);
 
 const updateScore = () => {
   raise(Number(scoreDto.value.score), 1);
-  emit('updateScore', true);
+  emit("updateScore", true);
 };
 
 const evaluated = ref(false);
@@ -159,7 +167,9 @@ const onKeyDown = (event) => {
         <span style="font-size: 18px">
           <span style="color: aliceblue">(</span>
           <span class="star full">&#9733;</span>
-          <span style="color: aliceblue">{{ starRating.validRating.toFixed(1) }})</span>
+          <span style="color: aliceblue"
+            >{{ starRating.validRating.toFixed(1) }})</span
+          >
         </span>
       </div>
     </div>
@@ -171,18 +181,38 @@ const onKeyDown = (event) => {
           <template v-if="!evaluated">
             <span style="color: white">후기를 남겨주세요!</span>
             <span>
-              <span class="star empty pointer" id="1" @click="scoring">&#9734;</span>
-              <span class="star empty pointer" id="2" @click="scoring">&#9734;</span>
-              <span class="star empty pointer" id="3" @click="scoring">&#9734;</span>
-              <span class="star empty pointer" id="4" @click="scoring">&#9734;</span>
-              <span class="star empty pointer" id="5" @click="scoring">&#9734;</span>
+              <span class="star empty pointer" id="1" @click="scoring"
+                >&#9734;</span
+              >
+              <span class="star empty pointer" id="2" @click="scoring"
+                >&#9734;</span
+              >
+              <span class="star empty pointer" id="3" @click="scoring"
+                >&#9734;</span
+              >
+              <span class="star empty pointer" id="4" @click="scoring"
+                >&#9734;</span
+              >
+              <span class="star empty pointer" id="5" @click="scoring"
+                >&#9734;</span
+              >
             </span>
           </template>
           <template v-else>
             <span style="color: white">후기를 남겨주세요!</span>
             <span>
-              <span v-for="n in Number(scoreDto.score)" :key="n" class="star full">&#9733;</span>
-              <span v-for="n in 5 - Number(scoreDto.score)" :key="n" class="star empty">&#9734;</span>
+              <span
+                v-for="n in Number(scoreDto.score)"
+                :key="n"
+                class="star full"
+                >&#9733;</span
+              >
+              <span
+                v-for="n in 5 - Number(scoreDto.score)"
+                :key="n"
+                class="star empty"
+                >&#9734;</span
+              >
             </span>
           </template>
         </div>
@@ -190,9 +220,11 @@ const onKeyDown = (event) => {
       <span style="color: white">여기는 이런 곳이에요!</span><br />
       <div class="themes">
         <template v-for="theme in themeInfos" :key="theme.themeId">
-          <router-link :to="{ name: 'detail', params: { themeId: theme.themeId } }" class="themeItem">{{
-            theme.themeName
-          }}</router-link>
+          <router-link
+            :to="{ name: 'detail', params: { themeId: theme.themeId } }"
+            class="themeItem"
+            >{{ theme.themeName }}</router-link
+          >
         </template>
       </div>
       <span style="color: white">이런 후기들이 있어요!</span><br />
@@ -204,7 +236,14 @@ const onKeyDown = (event) => {
       <span style="color: white">의견을 남겨주세요!</span><br />
       <template v-if="isLogin">
         <form>
-          <textarea name="" id="content" cols="42" rows="5" v-model="comment.content" @keydown="onKeyDown"></textarea>
+          <textarea
+            name=""
+            id="content"
+            cols="42"
+            rows="5"
+            v-model="comment.content"
+            @keydown="onKeyDown"
+          ></textarea>
           <button id="comment-btn" @click="handelComment">저장하기</button>
         </form>
       </template>

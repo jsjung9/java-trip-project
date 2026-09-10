@@ -1,25 +1,33 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { curTheme, updateTheme, allTags, tagsOfTheme, updateTag } from '@/api/theme';
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+  curTheme,
+  updateTheme,
+  allTags,
+  tagsOfTheme,
+  updateTag,
+} from "@/api/theme";
 
-import TagItem from '@/components/theme/TagItem.vue';
+import TagItem from "@/components/theme/TagItem.vue";
 
 const route = useRoute();
 const router = useRouter();
 
 const theme = ref({
   themeId: route.params.themeId,
-  themeName: '',
-  description: '',
-  editorId: '',
-  type: '',
-  visible: '',
-  likeSum: '',
+  themeName: "",
+  description: "",
+  editorId: "",
+  type: "",
+  visible: "",
+  likeSum: "",
 });
 
 const tags = ref([]);
-const selectedTags = ref({ 0: { tagId: '0', tagName: 'none', selected: false } });
+const selectedTags = ref({
+  0: { tagId: "0", tagName: "none", selected: false },
+});
 
 onMounted(() => {
   getTheme();
@@ -35,7 +43,7 @@ const getTheme = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -50,8 +58,8 @@ const checkPrivate = () => {
 
 const onThemeModify = (event) => {
   event.preventDefault();
-  if (theme.value.themeName.replace(/^\s+|\s+$/gm, '') === '') {
-    window.alert('테마 이름을 입력해주세요!');
+  if (theme.value.themeName.replace(/^\s+|\s+$/gm, "") === "") {
+    window.alert("테마 이름을 입력해주세요!");
   } else {
     updateTheme(
       theme.value,
@@ -60,7 +68,7 @@ const onThemeModify = (event) => {
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   }
 };
@@ -75,7 +83,7 @@ const getTags = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -103,7 +111,7 @@ const checkTags = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -122,14 +130,20 @@ const onUpdateTag = (tags) => {
       route.params.themeId,
       tagListDto.value,
       () => {
-        router.replace({ name: 'detail', parmas: { themeId: theme.value.themeId } });
+        router.replace({
+          name: "detail",
+          params: { themeId: theme.value.themeId },
+        });
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   } else {
-    router.replace({ name: 'detail', parmas: { themeId: theme.value.themeId } });
+    router.replace({
+      name: "detail",
+      params: { themeId: theme.value.themeId },
+    });
   }
 };
 </script>
@@ -140,21 +154,48 @@ const onUpdateTag = (tags) => {
     <form class="inputform mt-1">
       <div class="inputContainer mt-3">
         <label for="themeName" class="section">테마 이름</label>
-        <input type="text" id="themeName" name="themeName" class="input" v-model="theme.themeName" /><br />
+        <input
+          type="text"
+          id="themeName"
+          name="themeName"
+          class="input"
+          v-model="theme.themeName"
+        /><br />
       </div>
       <div class="inputContainer mt-3">
         <label for="description" class="section">테마 설명</label>
-        <input type="text" id="description" name="description" class="input" v-model="theme.description" /><br />
+        <input
+          type="text"
+          id="description"
+          name="description"
+          class="input"
+          v-model="theme.description"
+        /><br />
       </div>
       <div class="inputContainer mt-3">
         <span class="section">테마 유형</span>
         <div class="radios">
           <div>
-            <input type="radio" id="public" name="type" value="1" v-model="theme.type" checked @click="checkPublic" />
+            <input
+              type="radio"
+              id="public"
+              name="type"
+              value="1"
+              v-model="theme.type"
+              checked
+              @click="checkPublic"
+            />
             <label for="public">Public</label>
           </div>
           <div>
-            <input type="radio" id="private" name="type" value="0" v-model="theme.type" @click="checkPrivate" />
+            <input
+              type="radio"
+              id="private"
+              name="type"
+              value="0"
+              v-model="theme.type"
+              @click="checkPrivate"
+            />
             <label for="private">Private</label><br />
           </div>
         </div>
@@ -163,11 +204,25 @@ const onUpdateTag = (tags) => {
         <span class="section">공개 여부</span>
         <div class="radios">
           <div>
-            <input type="radio" id="visible" name="visible" value="1" v-model="theme.visible" :checked="isPublic" />
+            <input
+              type="radio"
+              id="visible"
+              name="visible"
+              value="1"
+              v-model="theme.visible"
+              :checked="isPublic"
+            />
             <label for="visible">공개</label>
           </div>
           <div>
-            <input type="radio" id="invisible" name="visible" value="0" v-model="theme.visible" :disabled="isPublic" />
+            <input
+              type="radio"
+              id="invisible"
+              name="visible"
+              value="0"
+              v-model="theme.visible"
+              :disabled="isPublic"
+            />
             <label for="invisible">비공개</label><br />
           </div>
         </div>
@@ -175,7 +230,7 @@ const onUpdateTag = (tags) => {
       <div class="inputContainer mt-3" id="tags">
         <span class="section">태그 목록</span>
         <tag-item
-          v-for="(tag, index) in tags"
+          v-for="tag in tags"
           :key="tag.tagId"
           :tag="tag"
           :class="{ unselected: !tag.selected, selected: tag.selected }"

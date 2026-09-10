@@ -1,35 +1,35 @@
 <script setup>
-import { ref } from 'vue';
-import { regist } from '@/api/editor';
-import router from '../../router';
+import { ref } from "vue";
+import { regist } from "@/api/editor";
+import router from "../../router";
 
 const loginEditor = ref({
-  id: '',
-  pw: '',
-  emailId: '',
-  emailDomain: '',
-  editorName: '',
+  id: "",
+  pw: "",
+  emailId: "",
+  emailDomain: "",
+  editorName: "",
 });
 
 const handelRegist = (evnet) => {
-  console.log('Enter handelRegist method');
+  console.log("Enter handelRegist method");
   evnet.preventDefault();
-  if (loginEditor.value.id.replace(/^\s+|\s+$/gm, '') === '') {
-    window.alert('id를 입력해주세요!');
-  } else if (loginEditor.value.pw.replace(/^\s+|\s+$/gm, '') === '') {
-    window.alert('비밀번호를 입력해주세요!');
+  if (loginEditor.value.id.replace(/^\s+|\s+$/gm, "") === "") {
+    window.alert("id를 입력해주세요!");
+  } else if (loginEditor.value.pw.replace(/^\s+|\s+$/gm, "") === "") {
+    window.alert("비밀번호를 입력해주세요!");
   } else {
     regist(
       loginEditor.value,
       () => {
-        window.alert('회원가입 성공!!');
-        router.replace('/login');
+        window.alert("회원가입 성공!!");
+        router.replace("/login");
       },
       (error) => {
         console.log(error);
-        window.alert('회원가입 실패..');
+        window.alert("회원가입 실패..");
         router.go(0);
-      }
+      },
     );
   }
 };
@@ -45,7 +45,12 @@ const handelRegist = (evnet) => {
       </div>
       <div class="inputContainer">
         <label for="editorName" class="registdata">이름</label>
-        <input type="text" id="editorName" class="input" v-model="loginEditor.editorName" />
+        <input
+          type="text"
+          id="editorName"
+          class="input"
+          v-model="loginEditor.editorName"
+        />
       </div>
       <div class="inputContainer">
         <label for="pw" class="registdata">비밀번호</label>
@@ -54,8 +59,18 @@ const handelRegist = (evnet) => {
       <div class="inputContainer mt-1">
         <label for="email" class="registdata">이메일</label>
         <div class="emailContainer">
-          <input type="text" id="emailId" class="input-email" v-model="loginEditor.emailId" />@
-          <input type="text" id="emailDomain" class="input-email" v-model="loginEditor.emailDomain" />
+          <input
+            type="text"
+            id="emailId"
+            class="input-email"
+            v-model="loginEditor.emailId"
+          />@
+          <input
+            type="text"
+            id="emailDomain"
+            class="input-email"
+            v-model="loginEditor.emailDomain"
+          />
         </div>
       </div>
       <div class="inputContainer">

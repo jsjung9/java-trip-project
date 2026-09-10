@@ -1,17 +1,16 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { hotTheme, allTheme, themesOfTag } from '@/api/theme';
-import ThemeItem from './ThemeItem.vue';
-import { objectToString } from '@vue/shared';
+import { ref, onMounted, watch } from "vue";
+import { hotTheme, allTheme, themesOfTag } from "@/api/theme";
+import ThemeItem from "./ThemeItem.vue";
 
 const props = defineProps({ type: String, tags: Object });
 
 const themes = ref([]);
 
 onMounted(() => {
-  if (props.type === 'all') {
+  if (props.type === "all") {
     getAllThemes();
-    watch(props.tags, (newTags, oldTags) => {
+    watch(props.tags, (newTags) => {
       getThemesofTag(newTags);
     });
   } else {
@@ -26,7 +25,7 @@ const getHotThemes = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -37,7 +36,7 @@ const getAllThemes = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -62,7 +61,7 @@ const getThemesofTag = (tags) => {
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   }
 };
@@ -70,7 +69,7 @@ const getThemesofTag = (tags) => {
 
 <template>
   <div id="list">
-    <template v-for="(theme, index) in themes" :key="theme.themeId">
+    <template v-for="theme in themes" :key="theme.themeId">
       <div class="theme">
         <theme-item :theme="theme" class="theme"></theme-item>
       </div>

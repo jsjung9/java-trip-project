@@ -1,10 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { power } from '@/api/editor';
-import EditorThemeList from '../components/editor/EditorThemeList.vue';
+import { ref, onMounted } from "vue";
+import { power } from "@/api/editor";
+import EditorThemeList from "../components/editor/EditorThemeList.vue";
 
 const editors = ref([]);
-const themes = ref([[]]);
 
 onMounted(() => {
   initialize();
@@ -22,7 +21,7 @@ const getPowerEditors = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 </script>
@@ -37,7 +36,10 @@ const getPowerEditors = () => {
         <span> ⭐{{ editor.likeSum }}</span>
       </div>
       <div class="theme-container">
-        <editor-theme-list :editorId="editor.editorId" type="all"></editor-theme-list>
+        <editor-theme-list
+          :editorId="editor.editorId"
+          type="all"
+        ></editor-theme-list>
       </div>
     </div>
   </div>

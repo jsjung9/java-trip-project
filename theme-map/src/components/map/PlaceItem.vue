@@ -1,43 +1,43 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { isThere, isInTheme, whoCreated, deletePlace } from '@/api/place';
-import { curTheme } from '@/api/theme';
-import { useRoute } from 'vue-router';
-import { useEditorStore } from '@/stores/editor';
+import { ref, onMounted, watch } from "vue";
+import { isThere, isInTheme, whoCreated, deletePlace } from "@/api/place";
+import { curTheme } from "@/api/theme";
+import { useRoute } from "vue-router";
+import { useEditorStore } from "@/stores/editor";
 
 const props = defineProps({ place: Object });
 const route = useRoute();
 const editorStore = useEditorStore();
 const { cEditorDto } = editorStore;
 
-const place = ref({
-  placeId: '',
-  placeName: '',
-  latitude: '',
-  longitude: '',
-  scoreSum: '',
-  scoreCount: '',
-  address: '',
-  phone: '',
+const placeView = ref({
+  placeId: "",
+  placeName: "",
+  latitude: "",
+  longitude: "",
+  scoreSum: "",
+  scoreCount: "",
+  address: "",
+  phone: "",
 });
 
 const theme = ref({
   themeId: route.params.themeId,
-  editorId: '',
+  editorId: "",
 });
 
 watch(
   () => props.place,
   (newPlace) => {
-    place.value = newPlace;
+    placeView.value = newPlace;
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(() => {
-  place.value = props.place;
+  placeView.value = props.place;
   checkIsThere();
-  if (route.name == 'detail') {
+  if (route.name == "detail") {
     getWhoCreated();
     getTheme();
   }
@@ -52,21 +52,21 @@ const getTheme = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
 const moveToKakao = () => {
-  window.open('https://place.map.kakao.com/' + place.value.placeId);
+  window.open("https://place.map.kakao.com/" + placeView.value.placeId);
 };
 /* ========> */
-const emit = defineEmits(['detail', 'delete']);
+const emit = defineEmits(["detail", "delete"]);
 
 const handlePlace = (event) => {
-  emit('detail', place.value, event.target.id);
+  emit("detail", placeView.value, event.target.id);
 };
 
-const editorId = ref('');
+const editorId = ref("");
 const getWhoCreated = () => {
   whoCreated(
     route.params.themeId,
@@ -76,7 +76,7 @@ const getWhoCreated = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 /* <======== */
@@ -94,7 +94,7 @@ const checkIsThere = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 const checkInThere = () => {
@@ -106,7 +106,7 @@ const checkInThere = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -115,11 +115,11 @@ const goDelete = () => {
     route.params.themeId,
     props.place.placeId,
     () => {
-      emit('delete');
+      emit("delete");
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -127,14 +127,22 @@ const raise = (param, count) => {
   starRating.value.rating =
     props.place.scoreCount === 0
       ? 0
-      : ((Number(props.place.scoreSum) + Number(param)) / (Number(props.place.scoreCount) + Number(count))).toFixed(1);
+      : (
+          (Number(props.place.scoreSum) + Number(param)) /
+          (Number(props.place.scoreCount) + Number(count))
+        ).toFixed(1);
   starRating.value.validRating =
-    !isNaN(parseFloat(starRating.value.rating)) && isFinite(starRating.value.rating)
+    !isNaN(parseFloat(starRating.value.rating)) &&
+    isFinite(starRating.value.rating)
       ? parseFloat(starRating.value.rating)
       : 0;
-  starRating.value.fullStars = Math.max(0, Math.min(5, Math.floor(starRating.value.validRating)));
+  starRating.value.fullStars = Math.max(
+    0,
+    Math.min(5, Math.floor(starRating.value.validRating)),
+  );
   starRating.value.halfStar = starRating.value.validRating % 1 >= 0.5 ? 1 : 0;
-  starRating.value.emptyStars = 5 - starRating.value.fullStars - starRating.value.halfStar;
+  starRating.value.emptyStars =
+    5 - starRating.value.fullStars - starRating.value.halfStar;
 };
 
 const starRating = ref({
@@ -153,11 +161,20 @@ const starRating = ref({
       place.scoreCount == 0 ? 0 : (place.scoreSum / place.scoreCount).toFixed(1)
     }}</span>
     <span class="star-rating mr3">
-      <span v-for="n in Math.max(0, starRating.fullStars)" :key="n" class="star full">&#9733;</span>
+      <span
+        v-for="n in Math.max(0, starRating.fullStars)"
+        :key="n"
+        class="star full"
+        >&#9733;</span
+      >
       <span v-if="starRating.halfStar" class="star empty">&#9734;</span>
-      <span v-for="n in starRating.emptyStars" :key="n" class="star empty">&#9734;</span>
+      <span v-for="n in starRating.emptyStars" :key="n" class="star empty"
+        >&#9734;</span
+      >
     </span>
-    <span style="color: black">({{ place.scoreCount == 0 ? 0 : place.scoreCount }}건)</span>
+    <span style="color: black"
+      >({{ place.scoreCount == 0 ? 0 : place.scoreCount }}건)</span
+    >
     <div class="mt5">{{ place.address }}</div>
     <div>{{ place.phone }}</div>
     <a href="" @click="moveToKakao">카카오맵에서 보기</a>
@@ -181,7 +198,10 @@ const starRating = ref({
     </template>
     <template
       v-if="
-        isLogin && route.name == 'detail' && (editorId == cEditorDto.editorId || theme.editorId == cEditorDto.editorId)
+        isLogin &&
+        route.name == 'detail' &&
+        (editorId == cEditorDto.editorId ||
+          theme.editorId == cEditorDto.editorId)
       "
     >
       <button class="deleteBtn" @click="goDelete">삭제</button>

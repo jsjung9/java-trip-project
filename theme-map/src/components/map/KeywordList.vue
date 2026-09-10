@@ -1,22 +1,25 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { createPlace, linkPlace } from '@/api/place';
-import { useEditorStore } from '@/stores/editor';
-import PlaceItem from './PlaceItem.vue';
-import router from '../../router';
+import { ref, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
+import { createPlace, linkPlace } from "@/api/place";
+import { useEditorStore } from "@/stores/editor";
+import PlaceItem from "./PlaceItem.vue";
+import router from "../../router";
 
 const editorStore = useEditorStore();
 
-const props = defineProps({ selectedPlace: String, hoveredPlace: String, placeList: Array });
+const props = defineProps({
+  selectedPlace: String,
+  hoveredPlace: String,
+  placeList: Array,
+});
 const { cEditorDto } = editorStore;
 
 const route = useRoute();
 const keywordPlaces = ref([]);
-const selected = ref('');
-const hovered = ref('');
-const keyword = ref('');
-const editorId = ref('');
+const hovered = ref("");
+const keyword = ref("");
+const editorId = ref("");
 
 onMounted(() => {
   // getHotPlace();
@@ -29,7 +32,7 @@ watch(
   () => {
     hovered.value = props.hoveredPlace;
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
@@ -37,7 +40,7 @@ watch(
   () => {
     hovered.value = props.hoveredPlace;
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
@@ -46,17 +49,17 @@ watch(
     keywordPlaces.value = [];
     keywordPlaces.value = { ...props.placeList };
   },
-  { deep: true }
+  { deep: true },
 );
 
 /* =============> */
-const emit = defineEmits(['detail']);
+const emit = defineEmits(["detail"]);
 
 const handleKeywordSearch = async () => {
-  emit('keyword', keyword.value);
+  emit("keyword", keyword.value);
 };
 const handleAdd = (place, id) => {
-  if (id == '1') {
+  if (id == "1") {
     // 장소를 생성
     createPlace(
       place,
@@ -68,16 +71,19 @@ const handleAdd = (place, id) => {
             editorId: editorId.value,
           },
           () => {
-            router.push({ name: 'detail', params: { themeId: route.params.themeId } });
+            router.push({
+              name: "detail",
+              params: { themeId: route.params.themeId },
+            });
           },
           (error) => {
             console.log(error);
-          }
+          },
         );
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   } else {
     // 테마와 장소를 연결
@@ -88,11 +94,14 @@ const handleAdd = (place, id) => {
         editorId: editorId.value,
       },
       () => {
-        router.push({ name: 'detail', params: { themeId: route.params.themeId } });
+        router.push({
+          name: "detail",
+          params: { themeId: route.params.themeId },
+        });
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   }
 };
@@ -117,7 +126,12 @@ const onKeyDown = (event) => {
       <button id="goBackBtn" @click="goBack"></button>
       <div class="items">
         <!-- =============> -->
-        <input type="text" v-model="keyword" id="searchBox" @keydown="onKeyDown" />
+        <input
+          type="text"
+          v-model="keyword"
+          id="searchBox"
+          @keydown="onKeyDown"
+        />
         <button @click="handleKeywordSearch" id="searchBtn">검색</button>
         <div class="items2 scrollbar">
           <template v-for="(place, index) in keywordPlaces" :key="index">

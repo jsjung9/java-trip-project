@@ -1,37 +1,39 @@
 <script setup>
-import { computed } from 'vue';
-import { useEditorStore } from '@/stores/editor';
-import { jwtDecode } from 'jwt-decode';
-import router from '../../router';
+import { computed } from "vue";
+import { useEditorStore } from "@/stores/editor";
+import router from "../../router";
 
 const editorStore = useEditorStore();
 
-const { cIsLogin, cEditorDto, cCurEditorDto, editorLogout } = editorStore;
+const { cIsLogin, cEditorDto, editorLogout } = editorStore;
 
-const editorStatus = computed(() => (cIsLogin.value ? '마이페이지' : '로그인'));
+const editorStatus = computed(() => (cIsLogin.value ? "마이페이지" : "로그인"));
 
-const routerName = computed(() => (cIsLogin.value ? 'mypage' : 'login'));
+const routerName = computed(() => (cIsLogin.value ? "mypage" : "login"));
 
 const handleLogout = async () => {
-  console.log('Enter handleLogout method');
-  let token = sessionStorage.getItem('accessToken');
-  let id = token === null ? cEditorDto.value.id : jwtDecode(token).id;
-
-  await editorLogout(id);
-  router.replace('/');
+  console.log("Enter handleLogout method");
+  await editorLogout(cEditorDto.value.id);
+  router.replace("/");
 };
 </script>
 
 <template>
   <div class="flex fixed" id="navbar">
     <span>
-      <router-link :to="{ name: 'place' }" class="title" id="logo">갈만할지도</router-link>
+      <router-link :to="{ name: 'place' }" class="title" id="logo"
+        >갈만할지도</router-link
+      >
     </span>
     <div class="flex" id="nav_btns">
       <router-link :to="{ name: 'place' }" id="nav_btn">지도로</router-link>
       <router-link :to="{ name: 'theme' }" id="nav_btn">테마별로</router-link>
-      <router-link :to="{ name: 'editor' }" id="nav_btn">에디터별로</router-link>
-      <router-link :to="{ name: routerName }" class="log_btn">{{ editorStatus }}</router-link>
+      <router-link :to="{ name: 'editor' }" id="nav_btn"
+        >에디터별로</router-link
+      >
+      <router-link :to="{ name: routerName }" class="log_btn">{{
+        editorStatus
+      }}</router-link>
       <template v-if="cIsLogin">
         <input type="button" id="logout" @click="handleLogout" />
       </template>
@@ -114,7 +116,7 @@ html {
   position: fixed;
   top: 4%;
   right: 2%;
-  background-image: url('../../assets/img/logout.png');
+  background-image: url("../../assets/img/logout.png");
   background-color: transparent;
   background-position: 0px 0px;
   background-repeat: no-repeat;

@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, watch, inject } from 'vue';
-import { hotPlace } from '@/api/place';
-import PlaceItem from './PlaceItem.vue';
-import PlaceDetail from '@/components/map/PlaceDetail.vue';
+import { ref, onMounted, watch, inject } from "vue";
+import { hotPlace } from "@/api/place";
+import PlaceItem from "./PlaceItem.vue";
+import PlaceDetail from "@/components/map/PlaceDetail.vue";
 
 const props = defineProps({ selectedPlace: String, hoveredPlace: String });
-const selected = ref('');
-const hovered = ref('');
+const selected = ref("");
+const hovered = ref("");
 
 onMounted(() => {
   getHotPlace();
@@ -17,7 +17,7 @@ watch(
   () => {
     selected.value = props.selectedPlace;
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
@@ -25,7 +25,7 @@ watch(
   () => {
     hovered.value = props.hoveredPlace;
   },
-  { deep: true }
+  { deep: true },
 );
 
 const hotPlaces = ref([]);
@@ -37,32 +37,32 @@ const getHotPlace = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
 /* =============> */
 // const props = defineProps({ placeList: Array });
-const emit = defineEmits(['clickPlace']);
-const clicked = inject('clicked');
+const emit = defineEmits(["clickPlace"]);
+const clicked = inject("clicked");
 
 // const hotPlaces = props.placeList;
 const visibility = ref(false);
 const placeToView = ref(null);
 
 const handleDetail = (place) => {
-  console.log('Enter handleDetail method');
+  console.log("Enter handleDetail method");
   if (placeToView.value === place) {
     visibility.value = !visibility.value;
   } else {
     visibility.value = true;
     placeToView.value = place;
   }
-  emit('clickPlace', place);
+  emit("clickPlace", place);
 };
 /* <============= */
 const updateScore = () => {
-  console.log('Enter update method');
+  console.log("Enter update method");
   hotPlaces.value = [];
   getHotPlace();
 };
@@ -76,7 +76,7 @@ const updateScore = () => {
       <div class="items">
         <!-- =============> -->
         <div class="items scrollbar">
-          <template v-for="(place, index) in hotPlaces" :key="place.placeId">
+          <template v-for="place in hotPlaces" :key="place.placeId">
             <!-- selected -->
             <template v-if="hovered == place.placeId">
               <place-item :place="place" @detail="handleDetail"></place-item>
@@ -87,7 +87,10 @@ const updateScore = () => {
           </template>
         </div>
         <template v-if="visibility && !clicked">
-          <place-detail :place="placeToView" @updateScore="updateScore"></place-detail>
+          <place-detail
+            :place="placeToView"
+            @updateScore="updateScore"
+          ></place-detail>
         </template>
         <!-- <============= -->
       </div>

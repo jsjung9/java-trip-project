@@ -1,25 +1,24 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { createTheme, allTags, updateTag } from '@/api/theme';
-import { useEditorStore } from '@/stores/editor';
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { createTheme, allTags, updateTag } from "@/api/theme";
+import { useEditorStore } from "@/stores/editor";
 
-import TagItem from '@/components/theme/TagItem.vue';
+import TagItem from "@/components/theme/TagItem.vue";
 
 const router = useRouter();
-const route = useRoute();
 
 const editorStore = useEditorStore();
 
 const { cEditorDto } = editorStore;
 
-const themeId = ref('');
+const themeId = ref("");
 const theme = ref({
-  themeName: '',
-  description: '',
+  themeName: "",
+  description: "",
   editorId: cEditorDto.value.editorId,
-  type: '1',
-  visible: '1',
+  type: "1",
+  visible: "1",
 });
 
 onMounted(() => {
@@ -36,7 +35,7 @@ const getTags = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -52,12 +51,14 @@ const onTagClick = (event) => {
 };
 
 const tags = ref([]);
-const selectedTags = ref({ 0: { tagId: '0', tagName: 'none', selected: false } });
+const selectedTags = ref({
+  0: { tagId: "0", tagName: "none", selected: false },
+});
 
 const onThemeCreate = (event) => {
   event.preventDefault();
-  if (theme.value.themeName.replace(/^\s+|\s+$/gm, '') === '') {
-    window.alert('테마 이름을 입력해주세요!');
+  if (theme.value.themeName.replace(/^\s+|\s+$/gm, "") === "") {
+    window.alert("테마 이름을 입력해주세요!");
   } else {
     createTheme(
       theme.value,
@@ -67,7 +68,7 @@ const onThemeCreate = (event) => {
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   }
 };
@@ -101,14 +102,14 @@ const onUpdateTag = (tags) => {
       themeId.value,
       tagListDto.value,
       () => {
-        router.replace({ name: 'keyword', params: { themeId: themeId.value } });
+        router.replace({ name: "keyword", params: { themeId: themeId.value } });
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   } else {
-    router.replace({ name: 'keyword', params: { themeId: themeId.value } });
+    router.replace({ name: "keyword", params: { themeId: themeId.value } });
   }
 };
 </script>
@@ -119,21 +120,48 @@ const onUpdateTag = (tags) => {
     <form class="inputform mt-1">
       <div class="inputContainer mt-3">
         <label for="themeName" class="section">테마 이름</label>
-        <input type="text" id="themeName" name="themeName" class="input" v-model="theme.themeName" />
+        <input
+          type="text"
+          id="themeName"
+          name="themeName"
+          class="input"
+          v-model="theme.themeName"
+        />
       </div>
       <div class="inputContainer mt-3">
         <label for="description" class="section">테마 설명</label>
-        <input type="text" id="description" name="description" class="input" v-model="theme.description" />
+        <input
+          type="text"
+          id="description"
+          name="description"
+          class="input"
+          v-model="theme.description"
+        />
       </div>
       <div class="inputContainer mt-3">
         <span class="section">테마 유형</span>
         <div class="radios">
           <div>
-            <input type="radio" id="public" name="type" value="1" v-model="theme.type" checked @click="checkPublic" />
+            <input
+              type="radio"
+              id="public"
+              name="type"
+              value="1"
+              v-model="theme.type"
+              checked
+              @click="checkPublic"
+            />
             <label for="public">Public</label>
           </div>
           <div>
-            <input type="radio" id="private" name="type" value="0" v-model="theme.type" @click="checkPrivate" />
+            <input
+              type="radio"
+              id="private"
+              name="type"
+              value="0"
+              v-model="theme.type"
+              @click="checkPrivate"
+            />
             <label for="private">Private</label><br />
           </div>
         </div>
@@ -169,7 +197,7 @@ const onUpdateTag = (tags) => {
       <div class="inputContainer mt-3" id="tags">
         <span class="section">태그 목록</span>
         <tag-item
-          v-for="(tag, index) in tags"
+          v-for="tag in tags"
           :key="tag.tagId"
           :tag="tag"
           :class="{ unselected: !tag.selected, selected: tag.selected }"

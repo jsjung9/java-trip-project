@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
-import { useEditorStore } from '@/stores/editor';
+import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
+import { useEditorStore } from "@/stores/editor";
 
 const router = useRouter();
 const editorStore = useEditorStore();
@@ -11,28 +11,28 @@ const { isLogin } = storeToRefs(editorStore);
 const { editorLogin } = editorStore;
 
 const loginEditor = ref({
-  id: '',
-  pw: '',
+  id: "",
+  pw: "",
   setToken: false,
 });
 
 const handleLogin = async (event) => {
-  console.log('Enter handleLogin method');
+  console.log("Enter handleLogin method");
   event.preventDefault();
   await editorLogin(loginEditor.value);
 
   if (isLogin.value) {
-    window.alert('로그인 성공!!');
-    router.push('/');
+    window.alert("로그인 성공!!");
+    router.push("/");
   } else {
-    window.alert('로그인 실패..');
+    window.alert("로그인 실패..");
     router.go(0);
   }
 };
 
 const handleSingIn = async () => {
-  console.log('Enter handleSingIn method');
-  router.push('regist');
+  console.log("Enter handleSingIn method");
+  router.push("regist");
 };
 </script>
 
@@ -61,7 +61,9 @@ const handleSingIn = async () => {
         </button>
       </div>
       <div class="inputContainer">
-        <label for="btn" class="registdata" @click="handleSingIn">회원가입</label>
+        <label for="btn" class="registdata" @click="handleSingIn"
+          >회원가입</label
+        >
       </div>
     </form>
   </div>

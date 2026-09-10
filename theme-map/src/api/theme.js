@@ -1,8 +1,8 @@
-import { serverAxios } from '@/util/http-commons';
+import { serverAxios } from "@/util/http-commons";
 
 const server = serverAxios();
 
-const url = '/theme';
+const url = "/theme";
 
 function hotTheme(success, fail) {
   server.get(`${url}/hot`).then(success).catch(fail);
@@ -17,11 +17,10 @@ function allTags(success, fail) {
 }
 
 function createTheme(theme, success, fail) {
-  server.post(`${url}/create`, JSON.stringify(theme)).then(success).catch(fail);
+  server.post(`${url}/create`, theme).then(success).catch(fail);
 }
 
 function themesOfPlace(placeId, success, fail) {
-  console.log(placeId);
   server.get(`${url}/place/${placeId}`).then(success).catch(fail);
 }
 
@@ -30,7 +29,7 @@ function curTheme(themeId, success, fail) {
 }
 
 function themesOfTag(tags, success, fail) {
-  server.post(`${url}/tag`, JSON.stringify(tags)).then(success).catch(fail);
+  server.post(`${url}/tag`, tags).then(success).catch(fail);
 }
 
 function didLike(editorId, themeId, success, fail) {
@@ -38,11 +37,11 @@ function didLike(editorId, themeId, success, fail) {
 }
 
 function postLike(likeDto, success, fail) {
-  server.post(`${url}/postLike`, JSON.stringify(likeDto)).then(success).catch(fail);
+  server.post(`${url}/postLike`, likeDto).then(success).catch(fail);
 }
 
 function disLike(likeDto, success, fail) {
-  server.post(`${url}/disLike`, JSON.stringify(likeDto)).then(success).catch(fail);
+  server.post(`${url}/disLike`, likeDto).then(success).catch(fail);
 }
 
 function themesOfEditor(editorId, success, fail) {
@@ -54,7 +53,7 @@ function themesOfLike(editorId, success, fail) {
 }
 
 function updateTheme(theme, success, fail) {
-  server.put(`${url}/update`, JSON.stringify(theme)).then(success).catch(fail);
+  server.put(`${url}/update`, theme).then(success).catch(fail);
 }
 
 function tagsOfTheme(themeId, success, fail) {
@@ -62,7 +61,7 @@ function tagsOfTheme(themeId, success, fail) {
 }
 
 function updateTag(themeId, tags, success, fail) {
-  server.post(`${url}/updateTag/${themeId}`, JSON.stringify(tags)).then(success).catch(fail);
+  server.post(`${url}/updateTag/${themeId}`, tags).then(success).catch(fail);
 }
 
 function visibleThemesOfEditor(editorId, success, fail) {

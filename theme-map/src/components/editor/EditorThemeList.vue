@@ -1,8 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { themesOfEditor, themesOfLike, visibleThemesOfEditor } from '@/api/theme';
-import ThemeItem from '@/components/theme/ThemeItem.vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted } from "vue";
+import {
+  themesOfEditor,
+  themesOfLike,
+  visibleThemesOfEditor,
+} from "@/api/theme";
+import ThemeItem from "@/components/theme/ThemeItem.vue";
+import { useRoute } from "vue-router";
 
 const props = defineProps({ editorId: String, type: String });
 const themes = ref([]);
@@ -10,7 +14,7 @@ const themes = ref([]);
 const route = useRoute();
 const ff = ref(true);
 onMounted(() => {
-  if (props.type === 'all') {
+  if (props.type === "all") {
     getThemesOfEditor();
   } else {
     getThemesOfLike();
@@ -18,7 +22,7 @@ onMounted(() => {
 });
 
 const getThemesOfEditor = () => {
-  if (route.name === 'mypage') {
+  if (route.name === "mypage") {
     themesOfEditor(
       props.editorId,
       ({ data }) => {
@@ -26,7 +30,7 @@ const getThemesOfEditor = () => {
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   } else {
     visibleThemesOfEditor(
@@ -36,7 +40,7 @@ const getThemesOfEditor = () => {
       },
       (error) => {
         console.log(error);
-      }
+      },
     );
   }
 };
@@ -49,14 +53,19 @@ const getThemesOfLike = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 </script>
 
 <template>
   <div id="list">
-    <theme-item v-for="(theme, index) in themes" :key="theme.themeId" :theme="theme" :ff="ff"></theme-item>
+    <theme-item
+      v-for="theme in themes"
+      :key="theme.themeId"
+      :theme="theme"
+      :ff="ff"
+    ></theme-item>
   </div>
 </template>
 

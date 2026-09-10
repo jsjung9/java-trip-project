@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { storeToRefs } from 'pinia';
-import { allTags } from '@/api/theme';
-import { useEditorStore } from '@/stores/editor';
+import { ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { allTags } from "@/api/theme";
+import { useEditorStore } from "@/stores/editor";
 
-import ThemeList from '@/components/theme/ThemeList.vue';
-import TagItem from '@/components/theme/TagItem.vue';
+import ThemeList from "@/components/theme/ThemeList.vue";
+import TagItem from "@/components/theme/TagItem.vue";
 
 const tags = ref([]);
 const editorStore = useEditorStore();
@@ -26,12 +26,14 @@ const getTags = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
 const cnt = ref(0);
-const selectedTags = ref({ 0: { tagId: '0', tagName: 'none', selected: false } });
+const selectedTags = ref({
+  0: { tagId: "0", tagName: "none", selected: false },
+});
 const onTagClick = (event) => {
   const index = event.target.id - 1;
   const tag = tags.value[index];
@@ -65,7 +67,9 @@ const onAllTag = () => {
       <div class="title">테마 지도 찾아보기</div>
       <template v-if="isLogin">
         <button class="btn mt-1">
-          <router-link class="btn-data" :to="{ name: 'create' }">+ 새 테마 등록하기</router-link>
+          <router-link class="btn-data" :to="{ name: 'create' }"
+            >+ 새 테마 등록하기</router-link
+          >
         </button>
       </template>
     </div>
@@ -78,9 +82,14 @@ const onAllTag = () => {
     <div id="allThemes" class="mt-3">
       <div class="theme-section">🌏 전체 테마</div>
       <div id="tags">
-        <button @click="onAllTag" :class="{ unselected: !allShow, selected: allShow }">전체</button>
+        <button
+          @click="onAllTag"
+          :class="{ unselected: !allShow, selected: allShow }"
+        >
+          전체
+        </button>
         <tag-item
-          v-for="(tag, index) in tags"
+          v-for="tag in tags"
           :key="tag.tagId"
           :tag="tag"
           :class="{ unselected: !tag.selected, selected: tag.selected }"

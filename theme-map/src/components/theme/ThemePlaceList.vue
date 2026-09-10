@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, inject } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useEditorStore } from '@/stores/editor';
-import { useRoute, useRouter } from 'vue-router';
-import { themePlace, getSpareNum } from '@/api/place';
-import { curTheme, didLike, postLike, disLike } from '@/api/theme';
-import PlaceItem from '@/components/map/PlaceItem.vue';
-import PlaceDetail from '@/components/map/PlaceDetail.vue';
+import { ref, onMounted, inject } from "vue";
+import { storeToRefs } from "pinia";
+import { useEditorStore } from "@/stores/editor";
+import { useRoute, useRouter } from "vue-router";
+import { themePlace, getSpareNum } from "@/api/place";
+import { curTheme, didLike, postLike, disLike } from "@/api/theme";
+import PlaceItem from "@/components/map/PlaceItem.vue";
+import PlaceDetail from "@/components/map/PlaceDetail.vue";
 
 const editorStore = useEditorStore();
 const { isLogin } = storeToRefs(editorStore);
@@ -17,12 +17,12 @@ const route = useRoute();
 const themePlaces = ref([]);
 const theme = ref({
   themeId: route.params.themeId,
-  themeName: '',
-  description: '',
-  editorId: '',
-  type: '',
-  visible: '',
-  likeSum: '',
+  themeName: "",
+  description: "",
+  editorId: "",
+  type: "",
+  visible: "",
+  likeSum: "",
 });
 
 onMounted(() => {
@@ -46,12 +46,12 @@ const getTheme = () => {
         },
         (error) => {
           console.log(error);
-        }
+        },
       );
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -63,7 +63,7 @@ const getThemePlace = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -77,7 +77,7 @@ const getDidLike = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -93,7 +93,7 @@ const like = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 const dislike = () => {
@@ -104,11 +104,11 @@ const dislike = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 /* =============> */
-const emit = defineEmits(['clickPlace']);
+const emit = defineEmits(["clickPlace"]);
 
 const visibility = ref(false);
 const placeToView = ref(null);
@@ -120,10 +120,10 @@ const handleDetail = (place) => {
     visibility.value = true;
     placeToView.value = place;
   }
-  emit('clickPlace', place);
+  emit("clickPlace", place);
 };
 
-const clicked = inject('clicked');
+const clicked = inject("clicked");
 
 const goBack = () => {
   router.go(-1);
@@ -139,13 +139,22 @@ const updateScore = () => {
 
 const canAdd = ref(false);
 const checkCanAdd = () => {
-  if (theme.value.type == 0 && theme.value.editorId == cEditorDto.value.editorId) {
+  if (
+    theme.value.type == 0 &&
+    theme.value.editorId == cEditorDto.value.editorId
+  ) {
     canAdd.value = true;
-  } else if (theme.value.type == 1 && theme.value.editorId == cEditorDto.value.editorId) {
+  } else if (
+    theme.value.type == 1 &&
+    theme.value.editorId == cEditorDto.value.editorId
+  ) {
     if (spareNum.value < 10) {
       canAdd.value = true;
     }
-  } else if (theme.value.type == 1 && theme.value.editorId != cEditorDto.value.editorId) {
+  } else if (
+    theme.value.type == 1 &&
+    theme.value.editorId != cEditorDto.value.editorId
+  ) {
     if (spareNum.value < 1) {
       canAdd.value = true;
     }
@@ -165,18 +174,30 @@ const checkCanAdd = () => {
         id="fullHeart"
         v-if="didILiked && isLogin"
         @click="dislike"
-        :class="{ beforeMoving: !visibility || clicked, afterMoving: visibility && !clicked }"
+        :class="{
+          beforeMoving: !visibility || clicked,
+          afterMoving: visibility && !clicked,
+        }"
       ></button>
       <button
         id="emptyHeart"
         v-if="!didILiked && isLogin"
         @click="like"
-        :class="{ beforeMoving: !visibility || clicked, afterMoving: visibility && !clicked }"
+        :class="{
+          beforeMoving: !visibility || clicked,
+          afterMoving: visibility && !clicked,
+        }"
       ></button>
-      <router-link :to="{ name: 'keyword', params: { themeId: theme.themeId } }" v-if="isLogin && canAdd">
+      <router-link
+        :to="{ name: 'keyword', params: { themeId: theme.themeId } }"
+        v-if="isLogin && canAdd"
+      >
         <button
           id="addBtn"
-          :class="{ beforeMoving: !visibility || clicked, afterMoving: visibility && !clicked }"
+          :class="{
+            beforeMoving: !visibility || clicked,
+            afterMoving: visibility && !clicked,
+          }"
         ></button>
       </router-link>
       <router-link :to="{ name: 'themeModify' }" :theme="theme">
@@ -203,9 +224,18 @@ const checkCanAdd = () => {
             @delete="handleDelete"
           ></place-item>
         </div>
-        <template v-if="isLogin && (theme.type == 1 || theme.editorId === cEditorDto.editorId)"> </template>
+        <template
+          v-if="
+            isLogin &&
+            (theme.type == 1 || theme.editorId === cEditorDto.editorId)
+          "
+        >
+        </template>
         <template v-if="visibility && !clicked">
-          <place-detail :place="placeToView" @updateScore="updateScore"></place-detail>
+          <place-detail
+            :place="placeToView"
+            @updateScore="updateScore"
+          ></place-detail>
         </template>
       </div>
     </div>

@@ -1,6 +1,6 @@
 <script setup>
-import { useEditorStore } from '@/stores/editor';
-import EditorThemeList from '@/components/editor/EditorThemeList.vue';
+import { useEditorStore } from "@/stores/editor";
+import EditorThemeList from "@/components/editor/EditorThemeList.vue";
 
 const editorStore = useEditorStore();
 const { cEditorDto } = editorStore;
@@ -13,15 +13,23 @@ const { cEditorDto } = editorStore;
         <span class="editor-name title">{{ cEditorDto.editorName }}</span>
         <span class="editor-name title"> ⭐{{ cEditorDto.likeSum }}</span>
       </span>
-      <router-link :to="{ name: 'modify' }" class="btn btn-data">내 정보 수정</router-link>
+      <router-link :to="{ name: 'modify' }" class="btn btn-data"
+        >내 정보 수정</router-link
+      >
     </div>
     <div class="theme-container">
       <div class="theme-section">⭐ 내가 만든 테마</div>
-      <editor-theme-list :editorId="cEditorDto.editorId" type="all"></editor-theme-list>
+      <editor-theme-list
+        :editorId="cEditorDto.editorId"
+        type="all"
+      ></editor-theme-list>
     </div>
     <div class="theme-container">
       <div class="theme-section">💘 내가 저장한 테마</div>
-      <editor-theme-list :editorId="cEditorDto.editorId" type="like"></editor-theme-list>
+      <editor-theme-list
+        :editorId="cEditorDto.editorId"
+        type="like"
+      ></editor-theme-list>
     </div>
   </div>
 </template>

@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { themePlace } from '@/api/place';
-import { editorName } from '@/api/editor';
+import { ref, onMounted } from "vue";
+import { themePlace } from "@/api/place";
+import { editorName } from "@/api/editor";
 
 const props = defineProps({ theme: Object, ff: Boolean });
 const placeNum = ref(null);
@@ -19,7 +19,7 @@ const initialize = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
   editorName(
     theme.editorId,
@@ -28,7 +28,7 @@ const initialize = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -37,7 +37,10 @@ const theme = props.theme;
 
 <template>
   <div id="themeItem" :class="{ ff: ff }">
-    <router-link class="theme" :to="{ name: 'detail', params: { themeId: theme.themeId } }">
+    <router-link
+      class="theme"
+      :to="{ name: 'detail', params: { themeId: theme.themeId } }"
+    >
       <div class="theme-name">{{ theme.themeName }}</div>
       <div class="theme-detail">{{ name }} {{ placeNum }}개의 장소</div>
       <div class="theme-likes">

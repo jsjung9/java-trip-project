@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { kakaoToDto } from '@/api/place';
-import KeywordList from '@/components/map/KeywordList.vue';
+import { ref, onMounted, watch } from "vue";
+import { kakaoToDto } from "@/api/place";
+import KeywordList from "@/components/map/KeywordList.vue";
 
 var map;
 const key = import.meta.env.VITE_KAKAO_MAP_KEY;
@@ -15,13 +15,13 @@ watch(
     temp.value = [];
     positions.value = [];
   },
-  { deep: true }
+  { deep: true },
 );
 onMounted(() => {
   if (window.kakao && window.kakao.maps) {
     initMap();
   } else {
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = key;
     /* global kakao */
     script.onload = () => kakao.maps.load(() => initMap());
@@ -30,7 +30,7 @@ onMounted(() => {
 });
 
 const initMap = () => {
-  const container = document.getElementById('map');
+  const container = document.getElementById("map");
   const options = {
     center: new kakao.maps.LatLng(33.450701, 126.570667),
     level: 3,
@@ -39,7 +39,7 @@ const initMap = () => {
 };
 
 const searchKeyWord = (keyword) => {
-  console.log('Enter searchKeyWord method:', keyword);
+  console.log("Enter searchKeyWord method:", keyword);
 
   searchPlaces(keyword);
 };
@@ -47,8 +47,8 @@ const searchKeyWord = (keyword) => {
 function searchPlaces(keyword) {
   var ps = new window.kakao.maps.services.Places();
 
-  if (!keyword.replace(/^\s+|\s+$/g, '')) {
-    window.alert('키워드를 입력해주세요!');
+  if (!keyword.replace(/^\s+|\s+$/g, "")) {
+    window.alert("키워드를 입력해주세요!");
     return false;
   }
 
@@ -62,17 +62,17 @@ function placesSearchCB(data, status) {
     for (let i = 0; i < data.length; i++) {
       placeList.value.push({ ...kakaoToDto(data[i]) });
     }
-    console.log('검색결과:', placeList.value);
+    console.log("검색결과:", placeList.value);
     loadMarkers();
   } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-    window.alert('검색 결과가 존재하지 않습니다.');
+    window.alert("검색 결과가 존재하지 않습니다.");
   } else if (status === kakao.maps.services.Status.ERROR) {
-    window.alert('검색 결과 중 오류가 발생했습니다.');
+    window.alert("검색 결과 중 오류가 발생했습니다.");
   }
 }
 
 var selectedMarker = ref(null);
-var hoveredPlace = ref('');
+var hoveredPlace = ref("");
 const loadMarkers = () => {
   // 현재 표시되어있는 marker들이 있다면 map에 등록된 marker를 제거한다.
   deleteMarkers();
@@ -119,19 +119,19 @@ const loadMarkers = () => {
     });
 
     // 마커에 mouseover 이벤트를 등록합니다
-    kakao.maps.event.addListener(marker, 'mouseover', function () {
+    kakao.maps.event.addListener(marker, "mouseover", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
-        console.log('호버IN', position.title, position.placeId);
+        console.log("호버IN", position.title, position.placeId);
         hoveredPlace.value = position.placeId;
         customOverlay.setMap(map);
       }
     });
 
     // 마커에 mouseout 이벤트를 등록합니다
-    kakao.maps.event.addListener(marker, 'mouseout', function () {
+    kakao.maps.event.addListener(marker, "mouseout", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
-        console.log('호버OUT', position.title, position.placeId);
-        hoveredPlace.value = '';
+        console.log("호버OUT", position.title, position.placeId);
+        hoveredPlace.value = "";
         customOverlay.setMap(null);
       }
     });
@@ -143,7 +143,7 @@ const loadMarkers = () => {
   // 배열.reduce( (누적값, 현재값, 인덱스, 요소)=>{ return 결과값}, 초기값);
   const bounds = positions.value.reduce(
     (bounds, position) => bounds.extend(position.latlng),
-    new kakao.maps.LatLngBounds()
+    new kakao.maps.LatLngBounds(),
   );
 
   map.setBounds(bounds);
@@ -159,7 +159,11 @@ const deleteMarkers = () => {
   <div>
     <!-- 카카오 맵 -->
     <div id="map" class="map" style="width: 100%; height: 100vh"></div>
-    <keyword-list @keyword="searchKeyWord" @clickPlace="clickPlace" :placeList="placeList"></keyword-list>
+    <keyword-list
+      @keyword="searchKeyWord"
+      @clickPlace="clickPlace"
+      :placeList="placeList"
+    ></keyword-list>
   </div>
 </template>
 

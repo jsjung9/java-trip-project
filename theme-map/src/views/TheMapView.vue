@@ -1,21 +1,21 @@
 <script setup>
-import { ref, onMounted, provide } from 'vue';
-import { hotPlace, dtoToKakao, themePlace } from '@/api/place';
-import { useRoute } from 'vue-router';
-import PlaceList from '../components/map/PlaceList.vue';
-import ThemePlaceList from '../components/theme/ThemePlaceList.vue';
-import router from '../router';
+import { ref, onMounted, provide } from "vue";
+import { hotPlace, dtoToKakao, themePlace } from "@/api/place";
+import { useRoute } from "vue-router";
+import PlaceList from "@/components/map/PlaceList.vue";
+import ThemePlaceList from "../components/theme/ThemePlaceList.vue";
+import router from "../router";
 
 var map;
 var selectedMarker = ref(null);
-var hoveredPlace = ref('');
-var selectedPlace = ref('');
+var hoveredPlace = ref("");
+var selectedPlace = ref("");
 const temp = ref([]);
 const positions = ref([]);
 const markers = ref([]);
 const clicked = ref(false);
 
-provide('clicked', clicked);
+provide("clicked", clicked);
 
 const route = useRoute();
 
@@ -25,14 +25,14 @@ onMounted(() => {
   if (window.kakao && window.kakao.maps) {
     initMap();
   } else {
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = key;
     /* global kakao */
     script.onload = () => kakao.maps.load(() => initMap());
     document.head.appendChild(script);
   }
 
-  if (route.name === 'place') {
+  if (route.name === "place") {
     getHotPlace();
   } else {
     getThemePlace();
@@ -40,7 +40,7 @@ onMounted(() => {
 });
 
 const initMap = () => {
-  const container = document.getElementById('map');
+  const container = document.getElementById("map");
   const options = {
     center: new kakao.maps.LatLng(33.450701, 126.570667),
     level: 3,
@@ -66,7 +66,7 @@ const loadMarkers = () => {
 
   // 마커를 생성합니다
   markers.value = [];
-  positions.value.forEach((position, index) => {
+  positions.value.forEach((position) => {
     const marker = new kakao.maps.Marker({
       map: map, // 마커를 표시할 지도
       position: position.latlng, // 마커를 표시할 위치
@@ -97,7 +97,7 @@ const loadMarkers = () => {
     });
 
     // 마커에 mouseover 이벤트를 등록합니다
-    kakao.maps.event.addListener(marker, 'mouseover', function () {
+    kakao.maps.event.addListener(marker, "mouseover", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
         hoveredPlace.value = position.placeId;
         customOverlay.setMap(map);
@@ -105,15 +105,15 @@ const loadMarkers = () => {
     });
 
     // 마커에 mouseout 이벤트를 등록합니다
-    kakao.maps.event.addListener(marker, 'mouseout', function () {
+    kakao.maps.event.addListener(marker, "mouseout", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
-        hoveredPlace.value = '';
+        hoveredPlace.value = "";
         customOverlay.setMap(null);
       }
     });
 
     // 마커에 click 이벤트를 등록합니다
-    kakao.maps.event.addListener(marker, 'click', function () {
+    kakao.maps.event.addListener(marker, "click", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
         selectedPlace.value = position.placeId;
       }
@@ -128,7 +128,7 @@ const loadMarkers = () => {
   // 배열.reduce( (누적값, 현재값, 인덱스, 요소)=>{ return 결과값}, 초기값);
   const bounds = positions.value.reduce(
     (bounds, position) => bounds.extend(position.latlng),
-    new kakao.maps.LatLngBounds()
+    new kakao.maps.LatLngBounds(),
   );
 
   map.setBounds(bounds);
@@ -150,8 +150,8 @@ const searchKeyWord = (keyword) => {
 function searchPlaces(keyword) {
   var ps = new window.kakao.maps.services.Places();
 
-  if (!keyword.replace(/^\s+|\s+$/g, '')) {
-    window.alert('키워드를 입력해주세요!');
+  if (!keyword.replace(/^\s+|\s+$/g, "")) {
+    window.alert("키워드를 입력해주세요!");
     return false;
   }
 
@@ -163,9 +163,9 @@ function placesSearchCB(data, status) {
     placeList.value = data;
     loadMarkers(data);
   } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-    window.alert('검색 결과가 존재하지 않습니다.');
+    window.alert("검색 결과가 존재하지 않습니다.");
   } else if (status === kakao.maps.services.Status.ERROR) {
-    window.alert('검색 결과 중 오류가 발생했습니다.');
+    window.alert("검색 결과 중 오류가 발생했습니다.");
   }
 }
 
@@ -183,7 +183,7 @@ const getHotPlace = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -193,7 +193,10 @@ const getThemePlace = () => {
     route.params.themeId,
     ({ data }) => {
       if (data.length == 0) {
-        router.replace({ name: 'keyword', params: { themeId: route.params.themeId } });
+        router.replace({
+          name: "keyword",
+          params: { themeId: route.params.themeId },
+        });
       }
       for (let i = 0; i < data.length; i++) {
         themePlaces.value.push(dtoToKakao(data[i]));
@@ -203,7 +206,7 @@ const getThemePlace = () => {
     },
     (error) => {
       console.log(error);
-    }
+    },
   );
 };
 
@@ -226,16 +229,21 @@ const clickPlace = (param) => {
 <template>
   <div>
     <!-- 카카오 맵 -->
-    <div id="map" class="map" @mousedown="clickMap" style="width: 100%; height: 100vh"></div>
+    <div
+      id="map"
+      class="map"
+      @mousedown="clickMap"
+      style="width: 100%; height: 100vh"
+    ></div>
     <!-- <router-view></router-view> -->
     <!-- =============> -->
     <template v-if="route.name === 'place'">
-      <place-list
+      <PlaceList
         @keyword="searchKeyWord"
         @clickPlace="clickPlace"
         :selectedPlace="selectedPlace"
         :hoveredPlace="hoveredPlace"
-      ></place-list>
+      ></PlaceList>
     </template>
     <template v-else>
       <theme-place-list @clickPlace="clickPlace"></theme-place-list>
