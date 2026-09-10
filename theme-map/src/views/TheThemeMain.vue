@@ -46,7 +46,7 @@ const onTagClick = (event) => {
   } else {
     delete selectedTags.value[tag.tagId];
     cnt.value = cnt.value - 1;
-    if (cnt.value == 0) {
+    if (cnt.value === 0) {
       allShow.value = true;
     }
   }

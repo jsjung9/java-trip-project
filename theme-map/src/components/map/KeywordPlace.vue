@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from "vue";
 import { kakaoToDto } from "@/api/place";
 import KeywordList from "@/components/map/KeywordList.vue";
 
-var map;
+let map;
 const key = import.meta.env.VITE_KAKAO_MAP_KEY;
 const temp = ref([]);
 const positions = ref([]);
@@ -45,7 +45,7 @@ const searchKeyWord = (keyword) => {
 };
 
 function searchPlaces(keyword) {
-  var ps = new window.kakao.maps.services.Places();
+  const ps = new window.kakao.maps.services.Places();
 
   if (!keyword.replace(/^\s+|\s+$/g, "")) {
     window.alert("키워드를 입력해주세요!");
@@ -71,14 +71,14 @@ function placesSearchCB(data, status) {
   }
 }
 
-var selectedMarker = ref(null);
-var hoveredPlace = ref("");
+const selectedMarker = ref(null);
+const hoveredPlace = ref("");
 const loadMarkers = () => {
   // 현재 표시되어있는 marker들이 있다면 map에 등록된 marker를 제거한다.
   deleteMarkers();
 
   temp.value.forEach((t) => {
-    let obj = {};
+    const obj = {};
     obj.latlng = new kakao.maps.LatLng(t.y, t.x);
     obj.title = t.place_name;
     obj.placeId = t.category_group_code;
@@ -98,7 +98,7 @@ const loadMarkers = () => {
     });
 
     // 커스텀 오버레이 내용
-    var overlayContent = `<div class="custom-overlay"
+    const overlayContent = `<div class="custom-overlay"
           style=
           "
           color: black;
@@ -110,12 +110,11 @@ const loadMarkers = () => {
     >${position.title}</div>`;
 
     // 커스텀 오버레이 생성
-    var customOverlay = new kakao.maps.CustomOverlay({
+    const customOverlay = new kakao.maps.CustomOverlay({
       content: overlayContent,
       position: position.latlng,
       xAnchor: 0.5,
       yAnchor: 3.0,
-      /* customize */
     });
 
     // 마커에 mouseover 이벤트를 등록합니다
@@ -157,7 +156,6 @@ const deleteMarkers = () => {
 
 <template>
   <div>
-    <!-- 카카오 맵 -->
     <div id="map" class="map" style="width: 100%; height: 100vh"></div>
     <keyword-list
       @keyword="searchKeyWord"

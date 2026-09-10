@@ -47,11 +47,11 @@ const tagListDto = ref({
 const getThemesofTag = (tags) => {
   tagListDto.value.tags = [];
   Object.values(tags).forEach((tag) => {
-    if (tag.tagId != 0) {
+    if (String(tag.tagId) !== "0") {
       tagListDto.value.tags.push(tag);
     }
   });
-  if (tagListDto.value.tags.length == 0) {
+  if (tagListDto.value.tags.length === 0) {
     getAllThemes();
   } else {
     themesOfTag(

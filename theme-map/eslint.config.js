@@ -15,6 +15,9 @@ export default [
     },
     rules: {
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      eqeqeq: ['error', 'always'],
+      'no-var': 'error',
+      'prefer-const': 'error',
       'vue/multi-word-component-names': 'off',
       'vue/require-default-prop': 'off',
     },

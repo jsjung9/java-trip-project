@@ -37,7 +37,7 @@ watch(
 onMounted(() => {
   placeView.value = props.place;
   checkIsThere();
-  if (route.name == "detail") {
+  if (route.name === "detail") {
     getWhoCreated();
     getTheme();
   }
@@ -59,7 +59,6 @@ const getTheme = () => {
 const moveToKakao = () => {
   window.open("https://place.map.kakao.com/" + placeView.value.placeId);
 };
-/* ========> */
 const emit = defineEmits(["detail", "delete"]);
 
 const handlePlace = (event) => {
@@ -79,7 +78,6 @@ const getWhoCreated = () => {
     },
   );
 };
-/* <======== */
 
 const thereIs = ref(false); //place table에 있는지
 const thereIn = ref(false); //place_in_theme table에 있는지

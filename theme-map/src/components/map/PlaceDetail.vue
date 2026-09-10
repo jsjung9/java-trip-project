@@ -135,7 +135,6 @@ const scoring = (event) => {
     scoreDto.value,
     () => {
       updateScore();
-      // router.go(0);
     },
     (error) => {
       console.log(error);
@@ -153,7 +152,7 @@ const updateScore = () => {
 const evaluated = ref(false);
 
 const onKeyDown = (event) => {
-  if (event.keyCode == 13) {
+  if (event.key === "Enter") {
     handelComment(event);
   }
 };

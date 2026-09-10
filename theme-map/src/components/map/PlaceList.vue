@@ -41,12 +41,9 @@ const getHotPlace = () => {
   );
 };
 
-/* =============> */
-// const props = defineProps({ placeList: Array });
 const emit = defineEmits(["clickPlace"]);
 const clicked = inject("clicked");
 
-// const hotPlaces = props.placeList;
 const visibility = ref(false);
 const placeToView = ref(null);
 
@@ -60,7 +57,6 @@ const handleDetail = (place) => {
   }
   emit("clickPlace", place);
 };
-/* <============= */
 const updateScore = () => {
   console.log("Enter update method");
   hotPlaces.value = [];
@@ -70,14 +66,11 @@ const updateScore = () => {
 
 <template>
   <div>
-    <!-- 리스트 -->
     <div class="list">
       <div class="name">🔥 요즘 뜨는 인기 장소</div>
       <div class="items">
-        <!-- =============> -->
         <div class="items scrollbar">
           <template v-for="place in hotPlaces" :key="place.placeId">
-            <!-- selected -->
             <template v-if="hovered == place.placeId">
               <place-item :place="place" @detail="handleDetail"></place-item>
             </template>
@@ -92,7 +85,6 @@ const updateScore = () => {
             @updateScore="updateScore"
           ></place-detail>
         </template>
-        <!-- <============= -->
       </div>
     </div>
   </div>

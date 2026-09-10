@@ -22,7 +22,6 @@ const keyword = ref("");
 const editorId = ref("");
 
 onMounted(() => {
-  // getHotPlace();
   editorId.value = cEditorDto.value.editorId;
   keywordPlaces.value = props.placeList;
 });
@@ -52,14 +51,13 @@ watch(
   { deep: true },
 );
 
-/* =============> */
 const emit = defineEmits(["detail"]);
 
 const handleKeywordSearch = async () => {
   emit("keyword", keyword.value);
 };
 const handleAdd = (place, id) => {
-  if (id == "1") {
+  if (id === "1") {
     // 장소를 생성
     createPlace(
       place,
@@ -105,14 +103,13 @@ const handleAdd = (place, id) => {
     );
   }
 };
-/* <============= */
 
 const goBack = () => {
   router.go(-1);
 };
 
 const onKeyDown = (event) => {
-  if (event.keyCode == 13) {
+  if (event.key === "Enter") {
     handleKeywordSearch();
   }
 };
@@ -120,12 +117,10 @@ const onKeyDown = (event) => {
 
 <template>
   <div>
-    <!-- 리스트 -->
     <div class="list">
       <div class="name">등록할 장소 찾아보기</div>
       <button id="goBackBtn" @click="goBack"></button>
       <div class="items">
-        <!-- =============> -->
         <input
           type="text"
           v-model="keyword"
@@ -138,7 +133,6 @@ const onKeyDown = (event) => {
             <place-item :place="place" @detail="handleAdd"></place-item>
           </template>
         </div>
-        <!-- <============= -->
       </div>
     </div>
   </div>

@@ -107,7 +107,6 @@ const dislike = () => {
     },
   );
 };
-/* =============> */
 const emit = defineEmits(["clickPlace"]);
 
 const visibility = ref(false);
@@ -140,20 +139,20 @@ const updateScore = () => {
 const canAdd = ref(false);
 const checkCanAdd = () => {
   if (
-    theme.value.type == 0 &&
-    theme.value.editorId == cEditorDto.value.editorId
+    String(theme.value.type) === "0" &&
+    String(theme.value.editorId) === String(cEditorDto.value.editorId)
   ) {
     canAdd.value = true;
   } else if (
-    theme.value.type == 1 &&
-    theme.value.editorId == cEditorDto.value.editorId
+    String(theme.value.type) === "1" &&
+    String(theme.value.editorId) === String(cEditorDto.value.editorId)
   ) {
     if (spareNum.value < 10) {
       canAdd.value = true;
     }
   } else if (
-    theme.value.type == 1 &&
-    theme.value.editorId != cEditorDto.value.editorId
+    String(theme.value.type) === "1" &&
+    String(theme.value.editorId) !== String(cEditorDto.value.editorId)
   ) {
     if (spareNum.value < 1) {
       canAdd.value = true;
@@ -162,12 +161,10 @@ const checkCanAdd = () => {
   console.log(spareNum.value);
   console.log(canAdd.value);
 };
-/* <============= */
 </script>
 
 <template>
   <div>
-    <!-- 리스트 -->
     <div class="list">
       <button id="goBackBtn" @click="goBack"></button>
       <button

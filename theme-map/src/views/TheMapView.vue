@@ -6,10 +6,10 @@ import PlaceList from "@/components/map/PlaceList.vue";
 import ThemePlaceList from "../components/theme/ThemePlaceList.vue";
 import router from "../router";
 
-var map;
-var selectedMarker = ref(null);
-var hoveredPlace = ref("");
-var selectedPlace = ref("");
+let map;
+const selectedMarker = ref(null);
+const hoveredPlace = ref("");
+const selectedPlace = ref("");
 const temp = ref([]);
 const positions = ref([]);
 const markers = ref([]);
@@ -55,7 +55,7 @@ const loadMarkers = () => {
   deleteMarkers();
 
   temp.value.forEach((t) => {
-    let obj = {};
+    const obj = {};
     obj.latlng = new kakao.maps.LatLng(t.y, t.x);
     obj.title = t.place_name;
     obj.placeId = t.category_group_code;
@@ -76,7 +76,7 @@ const loadMarkers = () => {
     });
 
     // 커스텀 오버레이 내용
-    var overlayContent = `<div class="custom-overlay"
+    const overlayContent = `<div class="custom-overlay"
         style=
         "
         color: black;
@@ -88,12 +88,11 @@ const loadMarkers = () => {
   >${position.title} <span style="color: black">(<span style="color: red">★</span>${position.score})</span></div>`;
 
     // 커스텀 오버레이 생성
-    var customOverlay = new kakao.maps.CustomOverlay({
+    const customOverlay = new kakao.maps.CustomOverlay({
       content: overlayContent,
       position: position.latlng,
       xAnchor: 0.5,
       yAnchor: 3.0,
-      /* customize */
     });
 
     // 마커에 mouseover 이벤트를 등록합니다
@@ -140,7 +139,6 @@ const deleteMarkers = () => {
   }
 };
 
-/* =============> */
 const placeList = ref([]);
 
 const searchKeyWord = (keyword) => {
@@ -148,7 +146,7 @@ const searchKeyWord = (keyword) => {
 };
 
 function searchPlaces(keyword) {
-  var ps = new window.kakao.maps.services.Places();
+  const ps = new window.kakao.maps.services.Places();
 
   if (!keyword.replace(/^\s+|\s+$/g, "")) {
     window.alert("키워드를 입력해주세요!");
@@ -169,7 +167,6 @@ function placesSearchCB(data, status) {
   }
 }
 
-/* <============= */
 const hotPlaces = ref([]);
 
 const getHotPlace = () => {
@@ -192,7 +189,7 @@ const getThemePlace = () => {
   themePlace(
     route.params.themeId,
     ({ data }) => {
-      if (data.length == 0) {
+      if (data.length === 0) {
         router.replace({
           name: "keyword",
           params: { themeId: route.params.themeId },
@@ -216,7 +213,7 @@ const clickMap = () => {
 
 const clickPlace = (param) => {
   // 이동할 위도 경도 위치를 생성합니다
-  var moveLatLon = new kakao.maps.LatLng(param.latitude, param.longitude);
+  const moveLatLon = new kakao.maps.LatLng(param.latitude, param.longitude);
 
   // 지도 중심을 이동 시킵니다
   map.setCenter(moveLatLon);
@@ -228,15 +225,12 @@ const clickPlace = (param) => {
 
 <template>
   <div>
-    <!-- 카카오 맵 -->
     <div
       id="map"
       class="map"
       @mousedown="clickMap"
       style="width: 100%; height: 100vh"
     ></div>
-    <!-- <router-view></router-view> -->
-    <!-- =============> -->
     <template v-if="route.name === 'place'">
       <PlaceList
         @keyword="searchKeyWord"
@@ -248,7 +242,6 @@ const clickPlace = (param) => {
     <template v-else>
       <theme-place-list @clickPlace="clickPlace"></theme-place-list>
     </template>
-    <!-- <============= -->
   </div>
 </template>
 
