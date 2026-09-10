@@ -19,7 +19,7 @@ provide("clicked", clicked);
 
 const route = useRoute();
 
-const key = import.meta.env.VITE_KAKAO_MAP_KEY;
+const key = import.meta.env.VITE_KAKAO_MAP_SCRIPT_URL;
 
 onMounted(() => {
   if (window.kakao && window.kakao.maps) {
