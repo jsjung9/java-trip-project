@@ -39,7 +39,6 @@ onMounted(() => {
   initialize();
 });
 
-// placeToView 객체가 변경될 때마다 initialize 함수를 호출
 watch(
   () => props.place,
   (newPlace, oldPlace) => {

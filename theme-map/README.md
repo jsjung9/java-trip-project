@@ -1,35 +1,11 @@
-# theme-map
+# Theme Map Web
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue 클라이언트입니다. 전체 설명, 실행 방법, API와 설계 문서는 [저장소 README](../README.md)를 참고하세요.
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
+```bash
+cp .env.example .env
+npm ci
 npm run dev
 ```
 
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+품질 검사는 `npm run lint`, `npm run test`, `npm run build`, `npm audit --audit-level=moderate` 순서로 실행합니다.

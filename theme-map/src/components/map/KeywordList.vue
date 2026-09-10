@@ -58,7 +58,6 @@ const handleKeywordSearch = async () => {
 };
 const handleAdd = (place, id) => {
   if (id === "1") {
-    // 장소를 생성
     createPlace(
       place,
       () => {
@@ -84,7 +83,6 @@ const handleAdd = (place, id) => {
       },
     );
   } else {
-    // 테마와 장소를 연결
     linkPlace(
       {
         themeId: route.params.themeId,

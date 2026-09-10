@@ -51,7 +51,6 @@ const initMap = () => {
 };
 
 const loadMarkers = () => {
-  // 현재 표시되어있는 marker들이 있다면 map에 등록된 marker를 제거한다.
   deleteMarkers();
 
   temp.value.forEach((t) => {
@@ -64,7 +63,6 @@ const loadMarkers = () => {
     positions.value.push(obj);
   });
 
-  // 마커를 생성합니다
   markers.value = [];
   positions.value.forEach((position) => {
     const marker = new kakao.maps.Marker({
@@ -75,7 +73,6 @@ const loadMarkers = () => {
       score: position.distance,
     });
 
-    // 커스텀 오버레이 내용
     const overlayContent = `<div class="custom-overlay"
         style=
         "
@@ -87,7 +84,6 @@ const loadMarkers = () => {
         ";
   >${position.title} <span style="color: black">(<span style="color: red">★</span>${position.score})</span></div>`;
 
-    // 커스텀 오버레이 생성
     const customOverlay = new kakao.maps.CustomOverlay({
       content: overlayContent,
       position: position.latlng,
@@ -95,7 +91,6 @@ const loadMarkers = () => {
       yAnchor: 3.0,
     });
 
-    // 마커에 mouseover 이벤트를 등록합니다
     kakao.maps.event.addListener(marker, "mouseover", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
         hoveredPlace.value = position.placeId;
@@ -103,7 +98,6 @@ const loadMarkers = () => {
       }
     });
 
-    // 마커에 mouseout 이벤트를 등록합니다
     kakao.maps.event.addListener(marker, "mouseout", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
         hoveredPlace.value = "";
@@ -111,20 +105,16 @@ const loadMarkers = () => {
       }
     });
 
-    // 마커에 click 이벤트를 등록합니다
     kakao.maps.event.addListener(marker, "click", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
         selectedPlace.value = position.placeId;
       }
 
-      // 클릭된 마커를 현재 클릭된 마커 객체로 설정합니다
       selectedMarker.value = marker;
     });
     markers.value.push(marker);
   });
 
-  // 4. 지도를 이동시켜주기
-  // 배열.reduce( (누적값, 현재값, 인덱스, 요소)=>{ return 결과값}, 초기값);
   const bounds = positions.value.reduce(
     (bounds, position) => bounds.extend(position.latlng),
     new kakao.maps.LatLngBounds(),
@@ -212,10 +202,8 @@ const clickMap = () => {
 };
 
 const clickPlace = (param) => {
-  // 이동할 위도 경도 위치를 생성합니다
   const moveLatLon = new kakao.maps.LatLng(param.latitude, param.longitude);
 
-  // 지도 중심을 이동 시킵니다
   map.setCenter(moveLatLon);
   map.setLevel(3);
 

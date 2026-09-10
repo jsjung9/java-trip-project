@@ -1,4 +1,3 @@
-// HTTP Status Code
 export const httpStatusCode = {
   OK: 200,
   CREATE: 201,

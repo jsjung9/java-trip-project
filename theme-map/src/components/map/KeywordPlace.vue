@@ -74,7 +74,6 @@ function placesSearchCB(data, status) {
 const selectedMarker = ref(null);
 const hoveredPlace = ref("");
 const loadMarkers = () => {
-  // 현재 표시되어있는 marker들이 있다면 map에 등록된 marker를 제거한다.
   deleteMarkers();
 
   temp.value.forEach((t) => {
@@ -86,18 +85,14 @@ const loadMarkers = () => {
     positions.value.push(obj);
   });
 
-  // 마커를 생성합니다
-
   positions.value.forEach((position) => {
     const marker = new kakao.maps.Marker({
       map: map, // 마커를 표시할 지도
       position: position.latlng, // 마커를 표시할 위치
       title: position.title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됨.
       clickable: true, // // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
-      // image: markerImage, // 마커의 이미지
     });
 
-    // 커스텀 오버레이 내용
     const overlayContent = `<div class="custom-overlay"
           style=
           "
@@ -109,7 +104,6 @@ const loadMarkers = () => {
           ";
     >${position.title}</div>`;
 
-    // 커스텀 오버레이 생성
     const customOverlay = new kakao.maps.CustomOverlay({
       content: overlayContent,
       position: position.latlng,
@@ -117,7 +111,6 @@ const loadMarkers = () => {
       yAnchor: 3.0,
     });
 
-    // 마커에 mouseover 이벤트를 등록합니다
     kakao.maps.event.addListener(marker, "mouseover", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
         console.log("호버IN", position.title, position.placeId);
@@ -126,7 +119,6 @@ const loadMarkers = () => {
       }
     });
 
-    // 마커에 mouseout 이벤트를 등록합니다
     kakao.maps.event.addListener(marker, "mouseout", function () {
       if (!selectedMarker.value || selectedMarker.value !== marker) {
         console.log("호버OUT", position.title, position.placeId);
@@ -138,8 +130,6 @@ const loadMarkers = () => {
     markers.value.push(marker);
   });
 
-  // 4. 지도를 이동시켜주기
-  // 배열.reduce( (누적값, 현재값, 인덱스, 요소)=>{ return 결과값}, 초기값);
   const bounds = positions.value.reduce(
     (bounds, position) => bounds.extend(position.latlng),
     new kakao.maps.LatLngBounds(),

@@ -1,70 +1,74 @@
-# 갈만할지도
+# 갈만할지도 (Theme Map)
 
-## 프로젝트 개요
-- 삼성 청년 SW 아카데미 1학기 관통 프로젝트로 구현한 프로젝트입니다.
-- 프로젝트 기간 : 2023.11.20 ~2023.11.24
+사용자가 목적에 맞는 장소를 모아 **공개 또는 비공개 테마 지도**를 만들고, 공개 지도에는 다른 사용자가 장소를 제안할 수 있는 웹 서비스입니다. 검색 결과를 저장하는 데서 끝나지 않고 테마, 기여 한도, 좋아요, 평점을 하나의 협업 모델로 연결했습니다.
 
-## 기획 의도
-### 함께 만드는 테마 지도, '갈만할지도'
-- 기존의 지도 어플을 사용하면서 ‘그냥 카페 말고 카공하기 좋은 카페를 찾고 싶은데’, ‘그냥 술집 말고 조용히 얘기하기 좋은 술집을 찾고 싶은데’ 라는 생각해 보신 적 있으신가요?
-- 아니면 ‘이 식당 진짜 맛있는데 사람들이 잘 모르네’ 라는 생각해 보신 적 있으신가요?
-- 갈만할지도는 테마 지도를 통해 이런 불편함을 해결하여, 편하게 원하는 장소를 검색하고 공유할 수 있습니다.
+> 2023년 11월 SSAFY 1학기 과정에서 2인 팀으로 시작한 프로젝트입니다. 정준수는 팀원으로 구현에 참여했고, 2026년에는 본 저장소를 독립적으로 현대화하며 보안·데이터 정합성·테스트·실행 환경·문서를 보완했습니다.
 
-## 프로젝트 설명
-**테마 지도**
-- 테마 지도는 두 가지 버전으로 나뉩니다. 함께 만드는 Public 테마 지도와 혼자 만드는 Private 테마 지도가 있습니다.
-- Public 테마 지도
-    - 모든 사용자가 어울리는 장소를 등록할 수 있지만, 무분별한 장소 등록을 막기 위해 등록 횟수에 제한을 두었습니다.
-    - 테마 지도 작성자는 최대 10개, 그 외 사용자는 최대 1개의 장소를 등록할 수 있습니다.
-- Private 테마 지도
-    - 혼자만 장소를 등록할 수 있고, 공개 여부를 설정할 수 있습니다.
-- 테마 지도마다 태그를 등록할 수 있고, 태그로 테마 지도를 검색할 수 있습니다.
+[시연 영상](https://youtu.be/hzVyXYYJk6Q)
 
-**파워 에디터**
-- ‘좋아요’를 많이 받은 사용자를 파워 에디터로 선정하여 사용자들의 참여를 유도하였습니다.
+![테마 지도 화면](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/272de01d-d9c2-42e6-b401-da9946aac33f)
 
-## 실행 화면
-- 시연 영상 : <https://youtu.be/hzVyXYYJk6Q?feature=shared>
-- 메인 페이지
-  ![스크린샷 2023-12-12 224929](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/272de01d-d9c2-42e6-b401-da9946aac33f)
-  ![스크린샷 2023-12-12 225117](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/2056ef60-0872-4492-9105-386c045928b5)
+## 해결한 문제
 
-- 마이페이지
-  ![스크린샷 2023-12-12 225032](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/558006a5-399c-45a4-82ab-d7d066a2992e)
+- 공개 지도는 작성자 최대 **10개**, 다른 사용자는 최대 **1개**의 장소를 등록할 수 있습니다. Private 지도는 작성자만 수정합니다.
+- 좋아요 관계와 테마·작성자 집계값을 한 트랜잭션에서 변경해 중간 실패로 수치가 어긋나는 상황을 막았습니다.
+- 한 사용자가 같은 장소에 평점을 다시 주면 누적하지 않고 기존 평가를 갱신합니다.
+- 테마 생성 ID는 DB 생성 키를 사용합니다. 동시 생성 시 다른 사용자의 ID를 반환할 수 있던 `MAX(id)` 조회를 제거했습니다.
+- 요청의 사용자 ID를 신뢰하지 않고 JWT 주체를 DB 사용자로 해석한 뒤 소유권을 검사합니다.
 
-- 테마 모아보기
-  ![스크린샷 2023-12-12 225140](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/df3b3a0a-f0c2-43ec-94f7-1ed7c67c0ca9)
+## 기술 구성
 
-- 테마 등록 페이지
-  ![스크린샷 2023-12-12 225251](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/af9b9971-e2d5-41cd-9da3-4f65b3c85137)
+| 영역 | 기술 |
+| --- | --- |
+| Web | Vue 3.5, Pinia 3, Vue Router 4, Axios 1.20, Vite 8 |
+| API | Java 17, Spring Boot 3.5, Spring Security, MyBatis 3 |
+| Data | MySQL 8.4, Flyway |
+| Quality | JUnit 5, Mockito, Vitest, ESLint 10, Prettier |
+| Delivery | Docker Compose, GitHub Actions, Dependabot |
 
-- 테마 상세 페이지
-  ![스크린샷 2023-12-12 225330](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/9d11a916-f98b-4f6e-96ce-3c74e6f1ec78)
-  ![스크린샷 2023-12-12 225426](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/a3c2e9d4-fc06-4c4d-85f2-324897b485b2)
+```mermaid
+flowchart LR
+    U[Browser] -->|Vue SPA| W[Web container]
+    U -->|Bearer access token| A[Spring Boot API]
+    A -->|MyBatis transaction| D[(MySQL)]
+    A -->|HttpOnly refresh cookie| U
+    U -->|JavaScript SDK| K[Kakao Maps]
+```
 
-- 파워 에디터
-  ![스크린샷 2023-12-12 225503](https://github.com/22-bottle/ssafy_final_pjt/assets/101461544/38851d1c-7090-4775-ad76-0a71053fbf49)
+## 실행
 
-## 기술 스택
-### Environment
-<div>
-    <img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
-    <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white">
-</div>
+1. `.env.compose.example`을 `.env`로 복사합니다.
+2. DB 비밀번호 두 개, 32바이트 이상의 JWT 비밀값, 도메인 제한을 건 Kakao JavaScript 키 URL을 입력합니다.
+3. `docker compose up --build`를 실행합니다.
+4. 웹은 `http://localhost:5173`, API 문서는 `http://localhost:8080/swagger-ui.html`에서 확인합니다.
 
-### Development
-<div>
-    <img src="https://img.shields.io/badge/vue.js-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white">
-    <img src="https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
-    <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
-</div>
+Docker 없이 실행하려면 다음 명령을 사용합니다.
 
-### Communication
-<div>
-    <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
-    <img src="https://img.shields.io/badge/googlemeet-00897B?style=for-the-badge&logo=googlemeet&logoColor=white">
-</div>
+```bash
+cd ThemeMap
+DB_PASSWORD=... JWT_SECRET_KEY=... ./mvnw spring-boot:run
 
-## 팀 정보
-- 팀장 : [이희병](https://github.com/22-bottle)
-- 팀원 : [정준수](https://github.com/jungjunsu)
+cd ../theme-map
+cp .env.example .env
+npm ci
+npm run dev
+```
+
+## 검증
+
+```bash
+cd ThemeMap && ./mvnw clean verify
+cd ../theme-map && npm ci && npm run lint && npm run test && npm run build
+npm audit --audit-level=moderate
+```
+
+현재 검증 기준은 백엔드 **13개 테스트**, 프론트엔드 **2개 테스트**, ESLint 오류 0건, npm 알려진 취약점 0건입니다. CI도 같은 검사를 수행합니다.
+
+## 문서
+
+- [요구사항과 수용 기준](docs/REQUIREMENTS.md)
+- [아키텍처와 데이터 흐름](docs/ARCHITECTURE.md)
+- [API 명세](docs/API.md)
+- [설계 결정 기록](docs/DECISIONS.md)
+- [코드·기술 학습 가이드](docs/LEARNING_GUIDE.md)
+- [현대화 결과와 검증 근거](docs/MODERNIZATION.md)

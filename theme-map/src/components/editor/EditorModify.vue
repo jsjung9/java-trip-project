@@ -7,7 +7,6 @@ const router = useRouter();
 const editorStore = useEditorStore();
 
 const { cEditorDto, editorModify } = editorStore;
-// 사용자 정보 수정을 위한 객체
 const editorUpdate = ref({
   id: "",
   pw: "",
