@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentDto {
-	
-	private String commentId;
-	private String placeId;
-	private String content;
-	
+
+    private String commentId;
+    private String placeId;
+    private String content;
+
 }

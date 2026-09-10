@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentListDto {
-	
-	private List<CommentDto> comments;
-	
+
+    private List<CommentDto> comments;
+
 }

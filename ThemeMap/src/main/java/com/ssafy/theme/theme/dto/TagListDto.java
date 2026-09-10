@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TagListDto {
 
-	private List<TagDto> tags;
-	
+    private List<TagDto> tags;
+
 }

@@ -5,94 +5,87 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.theme.editor.dto.EditorDto;
 import com.ssafy.theme.editor.mapper.EditorMapper;
-import com.ssafy.theme.util.Encrypt;
+import com.ssafy.theme.util.PasswordService;
 
 @Service
 public class EditorServiceImpl implements EditorService {
+    private final EditorMapper editorMapper;
+    private final PasswordService passwordService;
 
-	private EditorMapper editorMapper;
-	private Encrypt encrypt;
-	
-	@Autowired
-	public EditorServiceImpl(EditorMapper editorMapper, Encrypt encrypt) {
-		this.editorMapper = editorMapper;
-		this.encrypt = encrypt;
-	}
-	
-	@Override
-	public EditorDto login(EditorDto editorDto) throws Exception {
-		// 암호화로 확인
-		String userPw = editorDto.getPw();
-		editorDto = editorMapper.login(editorDto);
+    public EditorServiceImpl(EditorMapper editorMapper, PasswordService passwordService) {
+        this.editorMapper = editorMapper;
+        this.passwordService = passwordService;
+    }
 
-		return editorDto.getPw().equals(encrypt.getEncrypt(userPw, editorDto.getSalt())) ? editorDto : null;
-	}
+    @Override
+    @Transactional
+    public EditorDto login(EditorDto credentials) throws Exception {
+        EditorDto editor = editorMapper.login(credentials);
+        if (editor == null || !passwordService.matchesAndUpgrade(credentials.getPw(), editor)) {
+            return null;
+        }
+        return editor;
+    }
 
-	@Override
-	public EditorDto editorInfo(String id) throws Exception {
-		return editorMapper.editorInfo(id);
-	}
+    @Override
+    public EditorDto editorInfo(String id) throws Exception {
+        return editorMapper.editorInfo(id);
+    }
 
-	@Override
-	public EditorDto editorName(String id) throws SQLException {
-		return editorMapper.editorName(id);
-	}
+    @Override
+    public EditorDto editorName(String id) throws SQLException {
+        return editorMapper.editorName(id);
+    }
 
-	@Override
-	public int regist(EditorDto editorDto) {
-		String salt = encrypt.getSalt();
-		editorDto.setPw(encrypt.getEncrypt(editorDto.getPw(), salt));
-		editorDto.setSalt(salt);
-		
-		return editorMapper.regist(editorDto);
-	}
-	
-	@Override
-	public void saveRefreshToken(String id, String token) throws Exception {
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("id", id);
-		map.put("token", token);
-		editorMapper.saveRefreshToken(map);
-	}
+    @Override
+    public int regist(EditorDto editor) {
+        editor.setPw(passwordService.encode(editor.getPw()));
+        editor.setSalt(null);
+        return editorMapper.regist(editor);
+    }
 
-	@Override
-	public Object getRefreshToken(String id) throws Exception {
-		return editorMapper.getRefreshToken(id);
-	}
+    @Override
+    public void saveRefreshToken(String id, String token) throws Exception {
+        editorMapper.saveRefreshToken(Map.of("id", id, "token", token));
+    }
 
-	@Override
-	public void deleteRefreshToken(String id) throws Exception {
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("id", id);
-		map.put("token", null);
-		editorMapper.deleteRefreshToken(map);
-	}
+    @Override
+    public String getRefreshToken(String id) throws Exception {
+        return (String) editorMapper.getRefreshToken(id);
+    }
 
-	@Override
-	public int modify(EditorDto editorDto) {
-		String salt = getSalt(editorDto.getId());
-		editorDto.setPw(encrypt.getEncrypt(editorDto.getPw(), salt));
-		return editorMapper.modify(editorDto);
-	}
+    @Override
+    public void deleteRefreshToken(String id) throws Exception {
+        Map<String, String> values = new HashMap<>();
+        values.put("id", id);
+        values.put("token", null);
+        editorMapper.deleteRefreshToken(values);
+    }
 
-	@Override
-	public int resign(String id) {
-		return editorMapper.resign(id);
-	}
+    @Override
+    public int modify(EditorDto editor) {
+        editor.setPw(passwordService.encode(editor.getPw()));
+        editor.setSalt(null);
+        return editorMapper.modify(editor);
+    }
 
-	@Override
-	public String getSalt(String id) {
-		return editorMapper.getSalt(id);
-	}
+    @Override
+    public int resign(String id) {
+        return editorMapper.resign(id);
+    }
 
-	@Override
-	public List<EditorDto> power() throws Exception {
-		return editorMapper.power();
-	}
+    @Override
+    public String getSalt(String id) {
+        return editorMapper.getSalt(id);
+    }
 
+    @Override
+    public List<EditorDto> power() throws Exception {
+        return editorMapper.power();
+    }
 }

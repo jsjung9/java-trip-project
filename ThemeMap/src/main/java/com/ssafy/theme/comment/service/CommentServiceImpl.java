@@ -11,21 +11,21 @@ import com.ssafy.theme.comment.mapper.CommentMapper;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-	private CommentMapper commentMapper;
+    private CommentMapper commentMapper;
 
-	@Autowired
-	public CommentServiceImpl(CommentMapper commentMapper) {
-		this.commentMapper = commentMapper;
-	}
-	
-	@Override
-	public void registComment(CommentDto commentDto) throws Exception {
-		commentMapper.registComment(commentDto);
-	}
-	
-	@Override
-	public List<CommentDto> commentsOfPlace(String placeId) throws Exception {
-		return commentMapper.commentsOfPlace(placeId);
-	}
+    @Autowired
+    public CommentServiceImpl(CommentMapper commentMapper) {
+        this.commentMapper = commentMapper;
+    }
+
+    @Override
+    public void registComment(CommentDto commentDto) throws Exception {
+        commentMapper.registComment(commentDto);
+    }
+
+    @Override
+    public List<CommentDto> commentsOfPlace(String placeId) throws Exception {
+        return commentMapper.commentsOfPlace(placeId);
+    }
 
 }

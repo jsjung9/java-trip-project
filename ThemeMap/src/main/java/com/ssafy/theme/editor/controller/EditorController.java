@@ -1,20 +1,16 @@
 package com.ssafy.theme.editor.controller;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.HashMap;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,184 +24,126 @@ import com.ssafy.theme.editor.dto.EditorDto;
 import com.ssafy.theme.editor.service.EditorService;
 import com.ssafy.theme.util.JWTUtil;
 
-import lombok.extern.slf4j.Slf4j;
+import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/editor")
-@Slf4j
-public class EditorController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+@Validated
+public class EditorController {
+    private static final String REFRESH_COOKIE = "refresh_token";
 
-	private EditorService service;
-	private JWTUtil jwtUtil;
+    private final EditorService service;
+    private final JWTUtil jwtUtil;
+    private final boolean secureCookie;
 
-	@Autowired
-	public EditorController(EditorService service, JWTUtil jwtUtil) {
-		super();
-		this.service = service;
-		this.jwtUtil = jwtUtil;
-	}
-	
-	@PostMapping("/login")
-	public ResponseEntity<Map<String, Object>> login(@RequestBody EditorDto editorDto) {
-		Map<String, Object> resultMap = new HashMap<String, Object>();
-		HttpStatus status = HttpStatus.ACCEPTED;
-		try {
-			EditorDto editor = service.login(editorDto);
-			if(editor != null) {
-				String accessToken = jwtUtil.createAccessToken(editor.getId());
-				String refreshToken = jwtUtil.createRefreshToken(editor.getId());
-				
-				service.saveRefreshToken(editor.getId(), refreshToken);
-				
-				resultMap.put("access-token", accessToken);
-				resultMap.put("refresh-token", refreshToken);
-				resultMap.put("editor", editor);
-				status = HttpStatus.CREATED;
-			} else {
-				resultMap.put("message", "아이디 또는 패스워드를 확인해주세요.");
-				status = HttpStatus.UNAUTHORIZED;
-			}
-		} catch (Exception e) {
-			resultMap.put("message", e.getMessage());
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-		}
+    public EditorController(EditorService service, JWTUtil jwtUtil,
+            @Value("${security.cookie.secure:false}") boolean secureCookie) {
+        this.service = service;
+        this.jwtUtil = jwtUtil;
+        this.secureCookie = secureCookie;
+    }
 
-		return new ResponseEntity<Map<String, Object>>(resultMap, status);
-	}
-	
-	@GetMapping("/info/{id}")
-	public ResponseEntity<Map<String, Object>> getEditorInfo(@PathVariable("id") String id, HttpServletRequest request) {
-		Map<String, Object> resultMap = new HashMap<>();
-		HttpStatus status = HttpStatus.ACCEPTED;
-		if (jwtUtil.checkToken(request.getHeader("Authorization"))) {
-			try {
-				EditorDto editorDto = service.editorInfo(id);
-				resultMap.put("editorInfo", editorDto);
-				status = HttpStatus.OK;
-			} catch (Exception e) {
-				log.error("정보조회 실패 : {}", e);
-				resultMap.put("message", e.getMessage());
-				status = HttpStatus.INTERNAL_SERVER_ERROR;
-			}
-		} else {
-			log.error("사용 불가능 토큰!!!");
-			status = HttpStatus.UNAUTHORIZED;
-		}
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody EditorDto credentials) throws Exception {
+        EditorDto editor = service.login(credentials);
+        if (editor == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "아이디 또는 비밀번호를 확인해 주세요."));
+        }
+        String accessToken = jwtUtil.createAccessToken(editor.getId());
+        String refreshToken = jwtUtil.createRefreshToken(editor.getId());
+        service.saveRefreshToken(editor.getId(), refreshToken);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie(refreshToken).toString())
+                .body(Map.of("access-token", accessToken, "editor", editor));
+    }
 
-		return new ResponseEntity<Map<String, Object>>(resultMap, status);
-	}
+    @GetMapping({"/info", "/info/{ignoredId}"})
+    public Map<String, Object> getEditorInfo(Authentication authentication,
+            @PathVariable(required = false) String ignoredId) throws Exception {
+        return Map.of("editorInfo", service.editorInfo(authentication.getName()));
+    }
 
-	@GetMapping("/name/{id}")
-	public ResponseEntity<Map<String, Object>> getEditorName(@PathVariable("id") String id, HttpServletRequest request) {
-		Map<String, Object> resultMap = new HashMap<>();
-		HttpStatus status = HttpStatus.ACCEPTED;
-		try {
-			EditorDto editorDto = service.editorName(id);
-			resultMap.put("name", editorDto);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			log.error("정보조회 실패 : {}", e);
-			resultMap.put("message", e.getMessage());
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-		}
-		return new ResponseEntity<Map<String, Object>>(resultMap, status);
-	}
+    @GetMapping("/name/{editorId}")
+    public Map<String, Object> getEditorName(@PathVariable String editorId) throws Exception {
+        return Map.of("name", service.editorName(editorId));
+    }
 
     @PostMapping("/regist")
-    public ResponseEntity<?> regist(@RequestBody EditorDto editorDto) throws IOException {
-    	Map<String, Object> resultMap = new HashMap<>();
-    	HttpStatus status = HttpStatus.OK;
-    	try {
-    		service.regist(editorDto);
-    		resultMap.put("message", "회원가입 성공!!");
-    		status = HttpStatus.OK;
-    	} catch (Exception e) {
-    		resultMap.put("message", e.getMessage());
-    		status = HttpStatus.CONFLICT;
-		}
-    	return new ResponseEntity<Map<String, Object>>(resultMap, status);      
+    public ResponseEntity<?> regist(@Valid @RequestBody EditorDto editor) {
+        service.regist(editor);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "회원가입이 완료되었습니다."));
     }
-	
-	@PostMapping("/refresh")
-	public ResponseEntity<?> refreshToken(@RequestBody EditorDto editorDto, HttpServletRequest request) throws Exception {
-		Map<String, Object> resultMap = new HashMap<>();
-		HttpStatus status = HttpStatus.ACCEPTED;
-		String token = request.getHeader("refreshToken");
-		log.debug("token : {}, memberDto : {}", token, editorDto);
-		if (jwtUtil.checkToken(token)) {
-			if (token.equals(service.getRefreshToken(editorDto.getId()))) {
-				String accessToken = jwtUtil.createAccessToken(editorDto.getId());
-				resultMap.put("access-token", accessToken);
-				status = HttpStatus.CREATED;
-			}
-		} else {
-			status = HttpStatus.UNAUTHORIZED;
-		}
-		return new ResponseEntity<Map<String, Object>>(resultMap, status);
-	}
-	
-	@GetMapping("/logout/{id}")
-	public ResponseEntity<?> removeToken(@PathVariable("id") String id) {
-		Map<String, Object> resultMap = new HashMap<>();
-		HttpStatus status = HttpStatus.ACCEPTED;
-		try {
-			service.deleteRefreshToken(id);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			resultMap.put("message", e.getMessage());
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-		}
-		
-		return new ResponseEntity<Map<String, Object>>(resultMap, status);
-	}
-	
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) throws Exception {
+        String refreshToken = readCookie(request, REFRESH_COOKIE);
+        try {
+            String id = jwtUtil.getRefreshTokenSubject(refreshToken);
+            if (!refreshToken.equals(service.getRefreshToken(id))) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            String rotatedRefreshToken = jwtUtil.createRefreshToken(id);
+            service.saveRefreshToken(id, rotatedRefreshToken);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie(rotatedRefreshToken).toString())
+                    .body(Map.of("access-token", jwtUtil.createAccessToken(id)));
+        } catch (JwtException | IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(Authentication authentication) throws Exception {
+        service.deleteRefreshToken(authentication.getName());
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, clearRefreshCookie().toString())
+                .build();
+    }
+
     @PatchMapping("/modify")
-    public ResponseEntity<?> modify(@RequestBody EditorDto editorDto) {
-		Map<String, Object> resultMap = new HashMap<>();
-		HttpStatus status = HttpStatus.ACCEPTED;
-    	try {
-	        int r = service.modify(editorDto);
-	        status = r > 0 ? HttpStatus.OK : HttpStatus.NOT_MODIFIED;
-	        resultMap.put("message", r > 0 ? "회원정보 수정 성공!!" : "회원정보 수정 실패..");
-    	} catch (Exception e) {
-    		status = HttpStatus.INTERNAL_SERVER_ERROR;
-    		resultMap.put("message", "회원정보 수정 오류..");
-    	}
-    	return new ResponseEntity<Map<String, Object>>(resultMap, status);  
+    public ResponseEntity<?> modify(Authentication authentication, @Valid @RequestBody EditorDto editor) {
+        editor.setId(authentication.getName());
+        return service.modify(editor) > 0
+                ? ResponseEntity.ok(Map.of("message", "회원정보가 수정되었습니다."))
+                : ResponseEntity.notFound().build();
     }
-    
+
     @DeleteMapping("/resign")
-    public ResponseEntity<?> resign(@RequestBody String id) {
-		Map<String, Object> resultMap = new HashMap<>();
-		HttpStatus status = HttpStatus.ACCEPTED;
-    	try {
-    		int r = service.resign(id);
-    		status = r > 0 ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
-	        resultMap.put("message", r > 0 ? "회원 탈퇴 성공!!" : "회원 탈퇴 실패..");
-    	} catch (Exception e) {
-    		status = HttpStatus.INTERNAL_SERVER_ERROR;
-    		resultMap.put("message", "서버 오류..");
-    	}
-    	return new ResponseEntity<Map<String, Object>>(resultMap, status);  
+    public ResponseEntity<Void> resign(Authentication authentication) {
+        return service.resign(authentication.getName()) > 0
+                ? ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, clearRefreshCookie().toString()).build()
+                : ResponseEntity.notFound().build();
     }
 
-	@GetMapping("/power")
-	public ResponseEntity<?> power() {
-		try {
-			List<EditorDto> editors = service.power();
-			HttpHeaders header = new HttpHeaders();
-			header.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-			return ResponseEntity.ok().headers(header).body(editors);
-		} catch (Exception e) {
-			return exceptionHandling(e);
-		}
-	}
+    @GetMapping("/power")
+    public List<EditorDto> power() throws Exception {
+        return service.power();
+    }
 
-	private ResponseEntity<String> exceptionHandling(Exception e) {
-		e.printStackTrace();
-		return new ResponseEntity<String>("Error : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+    private ResponseCookie refreshCookie(String value) {
+        return ResponseCookie.from(REFRESH_COOKIE, value)
+                .httpOnly(true).secure(secureCookie).sameSite("Strict").path("/editor")
+                .maxAge(Duration.ofSeconds(jwtUtil.getRefreshTokenMaxAgeSeconds())).build();
+    }
 
+    private ResponseCookie clearRefreshCookie() {
+        return ResponseCookie.from(REFRESH_COOKIE, "")
+                .httpOnly(true).secure(secureCookie).sameSite("Strict").path("/editor").maxAge(0).build();
+    }
+
+    private String readCookie(HttpServletRequest request, String name) {
+        if (request.getCookies() == null) {
+            return null;
+        }
+        for (Cookie cookie : request.getCookies()) {
+            if (name.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
 }

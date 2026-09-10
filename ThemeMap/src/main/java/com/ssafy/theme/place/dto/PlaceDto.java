@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PlaceDto {
 
-	private String placeId;
-	private String placeName;
-	private String latitude;
-	private String longitude;
-	private String scoreSum;
-	private String scoreCount;
-	private String address;
-	private String phone;
-	
+    private String placeId;
+    private String placeName;
+    private String latitude;
+    private String longitude;
+    private String scoreSum;
+    private String scoreCount;
+    private String address;
+    private String phone;
+
 }

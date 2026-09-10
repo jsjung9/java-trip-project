@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScoreDto {
-	
-	private String placeId;
-	private String score;
+
+    private String placeId;
+    private String score;
 
 }

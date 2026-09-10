@@ -12,61 +12,61 @@ import com.ssafy.theme.place.mapper.PlaceMapper;
 @Service
 public class PlaceServiceImpl implements PlaceService {
 
-	private PlaceMapper placeMapper;
-	
-	@Autowired
-	public PlaceServiceImpl(PlaceMapper placeMapper) {
-		this.placeMapper =  placeMapper;
-	}
+    private PlaceMapper placeMapper;
 
-	@Override
-	public void createPlace(PlaceDto placeDto) throws Exception {
-		placeMapper.createPlace(placeDto);
-	}
+    @Autowired
+    public PlaceServiceImpl(PlaceMapper placeMapper) {
+        this.placeMapper =  placeMapper;
+    }
 
-	@Override
-	public List<PlaceDto> hotPlace() throws Exception {
-		return placeMapper.hotPlace();
-	}
+    @Override
+    public void createPlace(PlaceDto placeDto) throws Exception {
+        placeMapper.createPlace(placeDto);
+    }
 
-	@Override
-	public List<PlaceDto> placesOfTheme(String themeId) throws Exception {
-		return placeMapper.placesOfTheme(themeId);
-	}
-	
-	@Override
-	public void linkPlace(LinkDto linkDto) throws Exception {
-		placeMapper.linkPlace(linkDto);
-	}
+    @Override
+    public List<PlaceDto> hotPlace() throws Exception {
+        return placeMapper.hotPlace();
+    }
 
-	@Override
-	public void keepScore(String placeId, String score) throws Exception {
-		placeMapper.keepScore(placeId, score);
-	}
+    @Override
+    public List<PlaceDto> placesOfTheme(String themeId) throws Exception {
+        return placeMapper.placesOfTheme(themeId);
+    }
 
-	@Override
-	public int isThere(String placeId) throws Exception {
-		return placeMapper.isThere(placeId);
-	}
+    @Override
+    public void linkPlace(LinkDto linkDto) throws Exception {
+        placeMapper.linkPlace(linkDto);
+    }
 
-	@Override
-	public int isInTheme(String themeId, String placeId) throws Exception {
-		return placeMapper.isInTheme(themeId, placeId);
-	}
+    @Override
+    public void keepScore(String placeId, String score) throws Exception {
+        placeMapper.keepScore(placeId, score);
+    }
 
-	@Override
-	public void deletePlace(String themeId, String placeId) throws Exception {
-		placeMapper.deletePlace(themeId, placeId);
-	}
+    @Override
+    public int isThere(String placeId) throws Exception {
+        return placeMapper.isThere(placeId);
+    }
 
-	@Override
-	public String whoCreated(String themeId, String placeId) throws Exception {
-		return placeMapper.whoCreated(themeId, placeId);
-	}
+    @Override
+    public int isInTheme(String themeId, String placeId) throws Exception {
+        return placeMapper.isInTheme(themeId, placeId);
+    }
 
-	@Override
-	public int getSpareNum(String themeId, String editorId) throws Exception {
-		return placeMapper.getSpareNum(themeId, editorId);
-	}
+    @Override
+    public void deletePlace(String themeId, String placeId) throws Exception {
+        placeMapper.deletePlace(themeId, placeId);
+    }
+
+    @Override
+    public String whoCreated(String themeId, String placeId) throws Exception {
+        return placeMapper.whoCreated(themeId, placeId);
+    }
+
+    @Override
+    public int getSpareNum(String themeId, String editorId) throws Exception {
+        return placeMapper.getSpareNum(themeId, editorId);
+    }
 
 }

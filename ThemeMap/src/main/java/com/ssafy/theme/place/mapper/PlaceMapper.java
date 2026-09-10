@@ -11,24 +11,24 @@ import com.ssafy.theme.theme.dto.ThemeDto;
 @Mapper
 public interface PlaceMapper {
 
-	void createPlace(PlaceDto placeDto) throws Exception;
+    void createPlace(PlaceDto placeDto) throws Exception;
 
-	List<PlaceDto> hotPlace() throws Exception;
+    List<PlaceDto> hotPlace() throws Exception;
 
-	List<PlaceDto> placesOfTheme(String themeId) throws Exception;
+    List<PlaceDto> placesOfTheme(String themeId) throws Exception;
 
-	void linkPlace(LinkDto linkDto) throws Exception;
-	
-	void keepScore(String placeId, String score) throws Exception;
+    void linkPlace(LinkDto linkDto) throws Exception;
 
-	int isThere(String placeId) throws Exception;
+    void keepScore(String placeId, String score) throws Exception;
 
-	int isInTheme(String themeId, String placeId) throws Exception;
+    int isThere(String placeId) throws Exception;
 
-	void deletePlace(String themeId, String placeId) throws Exception;
+    int isInTheme(String themeId, String placeId) throws Exception;
 
-	String whoCreated(String themeId, String placeId) throws Exception;
+    void deletePlace(String themeId, String placeId) throws Exception;
 
-	int getSpareNum(String themeId, String editorId) throws Exception;
+    String whoCreated(String themeId, String placeId) throws Exception;
+
+    int getSpareNum(String themeId, String editorId) throws Exception;
 
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LikeDto {
 
-	private String editorId;
-	private String themeId;
-	
+    private String editorId;
+    private String themeId;
+
 }

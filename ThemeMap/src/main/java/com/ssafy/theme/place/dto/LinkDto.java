@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LinkDto {
 
-	private String themeId;
-	private String placeId;
-	private String editorId;
-	
+    private String themeId;
+    private String placeId;
+    private String editorId;
+
 }

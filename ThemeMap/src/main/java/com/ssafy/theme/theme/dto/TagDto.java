@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TagDto {
 
-	private String tagId;
-	private String tagName;
-	
+    private String tagId;
+    private String tagName;
+
 }

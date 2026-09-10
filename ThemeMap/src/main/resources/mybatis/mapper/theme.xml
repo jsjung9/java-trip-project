@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-    
+
 <mapper namespace="com.ssafy.theme.theme.mapper.ThemeMapper">
 
     <resultMap type="themeDto" id="theme">
@@ -13,17 +13,17 @@
         <result column="visible" property="visible"/>
         <result column="like_sum" property="likeSum"/>
     </resultMap>
-    
+
     <resultMap type="tagDto" id="tag">
         <result column="tag_id" property="tagId"/>
         <result column="tag_name" property="tagName"/>
     </resultMap>
-    
+
     <insert id="createTheme" parameterType="themeDto">
         insert into theme (theme_name, editor_id, description, type, visible, like_sum)
         values (#{themeName}, #{editorId}, #{description}, #{type}, #{visible}, 0)
     </insert>
-    
+
     <select id="hotTheme" resultMap="theme">
         select t.theme_id, t.theme_name, t.description, t.editor_id, t.type, t.visible, t.like_sum from theme t
         join place_in_theme pt on t.theme_id = pt.theme_id
@@ -32,7 +32,7 @@
         having count(pt.place_id) > 0
         order by like_sum desc limit 10
     </select>
-    
+
     <select id="themesOfPlace" parameterType="string" resultMap="theme">
         select theme_id, theme_name, editor_id, description, type, visible, like_sum from theme
         where theme_id in (
@@ -40,7 +40,7 @@
             where place_id = #{placeId}
         )
     </select>
-    
+
     <select id="themesOfEditor" parameterType="string" resultMap="theme">
         select theme_id, theme_name, description, editor_id, type, visible, like_sum from theme
         where editor_id = #{editorId}
@@ -60,17 +60,17 @@
             where editor_id = #{editorId}
         );
     </select>
-    
+
     <update id="updateTheme" parameterType="themeDto">
         update theme set theme_name = #{themeName}, description = #{description}, type = #{type}, visible = #{visible}
         where theme_id = #{themeId}
     </update>
-    
+
     <delete id="deleteTheme" parameterType="string">
         delete from theme
         where theme_id = #{themeId}
     </delete>
-    
+
     <select id="themesOfTag" parameterType="list" resultMap="theme">
         select t.theme_id, t.theme_name, t.description, t.editor_id, t.type, t.visible, t.like_sum from theme t
         join place_in_theme pt on t.theme_id = pt.theme_id
@@ -86,7 +86,7 @@
         group by t.theme_id
         having count(pt.place_id) > 0
     </select>
-    
+
     <select id="allThemes" resultMap="theme">
         select t.theme_id, t.theme_name, t.description, t.editor_id, t.type, t.visible, t.like_sum from theme t
         join place_in_theme pt on t.theme_id = pt.theme_id
@@ -94,32 +94,32 @@
         group by t.theme_id
         having count(pt.place_id) > 0
     </select>
-    
+
     <select id="allTags" resultMap="tag">
         select tag_id, tag_name from tag
     </select>
-    
+
     <select id="getTheme" parameterType="string" resultMap="theme">
         select theme_id, theme_name, description, editor_id, type, visible, like_sum from theme
         where theme_id = #{themeId}
     </select>
-    
+
     <select id="didLike" parameterType="string" resultType="int">
         select count(editor_id) from like_theme
         where editor_id = #{editorId} and theme_id = #{themeId}
     </select>
-    
+
     <insert id="postLike" parameterType="string">
         insert into like_theme (editor_id, theme_id)
         values (#{editorId}, #{themeId})
     </insert>
-    
+
     <update id="increaseThemeLike" parameterType="string">
         update theme
         set like_sum = like_sum + 1
         where theme_id = #{themeId}
     </update>
-    
+
     <update id="increaseEditorLike" parameterType="string">
         update editor
         set like_sum = like_sum + 1
@@ -130,7 +130,7 @@
         delete from like_theme
         where editor_id = #{editorId} and theme_id = #{themeId}
     </delete>
-    
+
     <update id="decreaseThemeLike" parameterType="string">
         update theme
         set like_sum = like_sum - 1
@@ -142,31 +142,31 @@
         set like_sum = like_sum - 1
         where editor_id = #{editorId}
     </update>
-    
+
     <select id="findEditor" parameterType="string" resultType="string">
         select editor_id
         from theme
         where theme_id = #{themeId}
     </select>
-    
+
     <select id="returnTheme" resultType="string">
-    	select max(theme_id) from theme
+        select max(theme_id) from theme
     </select>
-    
+
     <select id="tagsOfTheme" parameterType="string" resultMap="tag">
-    	select t.tag_id, t.tag_name from tag t
-		join tag_in_theme tt on t.tag_id = tt.tag_id
-		where tt.theme_id = #{themeId};
+        select t.tag_id, t.tag_name from tag t
+        join tag_in_theme tt on t.tag_id = tt.tag_id
+        where tt.theme_id = #{themeId};
     </select>
-    
+
     <delete id="deleteTags" parameterType="string">
-    	delete from tag_in_theme
-    	where theme_id = #{themeId}
+        delete from tag_in_theme
+        where theme_id = #{themeId}
     </delete>
-    
+
     <insert id="insertTags" parameterType="string">
-    	insert into tag_in_theme (theme_id, tag_id)
-    	values (#{themeId}, #{tagId})
+        insert into tag_in_theme (theme_id, tag_id)
+        values (#{themeId}, #{tagId})
     </insert>
-    
+
 </mapper>
